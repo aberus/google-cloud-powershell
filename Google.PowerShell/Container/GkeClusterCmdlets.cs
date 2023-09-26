@@ -402,7 +402,7 @@ namespace Google.PowerShell.Container
     /// <example>
     ///   <code>PS C:\> New-GkeNodeConfig -DiskSizeGb 20 -SsdCount 2</code>
     ///   <para>
-    ///   Creates a node config with 20 Gb disk size and 2 SSDs for each node.</para>
+    ///   Creates a node config with 20 GB disk size and 2 SSDs for each node.</para>
     /// </example>
     /// <example>
     ///   <code>PS C:\> New-GkeNodeConfig -Metadata @{"key" = "value"} -Label @{"release" = "stable"}</code>

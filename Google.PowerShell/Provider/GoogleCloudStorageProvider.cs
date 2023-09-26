@@ -94,7 +94,7 @@ namespace Google.PowerShell.Provider
         }
 
         /// <summary>
-        /// Dynamic paramters for New-Item with a bucket path.
+        /// Dynamic parameters for New-Item with a bucket path.
         /// </summary>
         public class NewGcsBucketDynamicParameters
         {
@@ -554,7 +554,7 @@ namespace Google.PowerShell.Provider
         /// Writes the object descriptions of the items in the container to the output. Used by Get-ChildItem.
         /// </summary>
         /// <param name="path">The path of the container.</param>
-        /// <param name="recurse">If true, get all descendents of the container, not just immediate children.</param>
+        /// <param name="recurse">If true, get all descendants of the container, not just immediate children.</param>
         protected override void GetChildItems(string path, bool recurse)
         {
             GcsPath gcsPath = GcsPath.Parse(path);
@@ -591,7 +591,7 @@ namespace Google.PowerShell.Provider
         /// <summary>
         /// Creates a new item at the given path.
         /// </summary>
-        /// <param name="path">The path of the item ot create.</param>
+        /// <param name="path">The path of the item to create.</param>
         /// <param name="itemTypeName">The type of item to create. "Directory" is the only special one.
         /// That will create an object with a name ending in "/".</param>
         /// <param name="newItemValue">The value of the item to create. We assume it is a string.</param>
@@ -652,7 +652,7 @@ namespace Google.PowerShell.Provider
         /// </summary>
         /// <param name="path">The path to copy from.</param>
         /// <param name="copyPath">The path to copy to.</param>
-        /// <param name="recurse">If true, will copy all decendent objects as well.</param>
+        /// <param name="recurse">If true, will copy all descendant objects as well.</param>
         protected override void CopyItem(string path, string copyPath, bool recurse)
         {
             if (!ShouldProcess($"Copy-Item from {path} to {copyPath}"))
@@ -817,7 +817,7 @@ namespace Google.PowerShell.Provider
         /// Deletes a Google Cloud Storage object or bucket. Used by Remove-Item.
         /// </summary>
         /// <param name="path">The path to the object or bucket to remove.</param>
-        /// <param name="recurse">If true, will remove the desendants of the item as well. Required for a
+        /// <param name="recurse">If true, will remove the descendants of the item as well. Required for a
         /// non-empty bucket.</param>
         protected override void RemoveItem(string path, bool recurse)
         {
@@ -920,7 +920,7 @@ namespace Google.PowerShell.Provider
         }
 
         /// <summary>
-        /// Waits on the list of delete tasks to compelete, updating progress as it does so.
+        /// Waits on the list of delete tasks to complete, updating progress as it does so.
         /// </summary>
         private void WaitDeleteTasks(List<Task<string>> deleteTasks)
         {
@@ -1103,7 +1103,7 @@ namespace Google.PowerShell.Provider
                 ListProjectsResponse projects = request.Execute();
                 foreach (Project project in projects.Projects ?? Enumerable.Empty<Project>())
                 {
-                    // The Storage Service considers invactive projects to not exist.
+                    // The Storage Service considers inactive projects to not exist.
                     if (project.LifecycleState == "ACTIVE")
                     {
                         yield return project;

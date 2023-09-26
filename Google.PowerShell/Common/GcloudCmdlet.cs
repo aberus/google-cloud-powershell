@@ -18,7 +18,7 @@ using System.Text.RegularExpressions;
 namespace Google.PowerShell.Common
 {
     /// <summary>
-    /// Base commandlet for all Google Cloud cmdlets.
+    /// Base cmdlet for all Google Cloud cmdlets.
     /// </summary>
     public abstract class GCloudCmdlet : PSCmdlet, IDisposable
     {
@@ -109,8 +109,8 @@ namespace Google.PowerShell.Common
         }
 
         /// <summary>
-        /// Returns the fully-qualified file path, properly relative file paths (taking the current Powershell
-        /// environemnt into account.)
+        /// Returns the fully-qualified file path, properly relative file paths (taking the current PowerShell
+        /// environment into account.)
         ///
         /// This method eliminates a class of bug where cmdlets do not support relative file paths. Because
         /// Path.GetFile only handles file paths relative to the current (process) directory, which is not going to be
@@ -193,9 +193,9 @@ namespace Google.PowerShell.Common
         }
 
         /// <summary>
-        /// Sets properties and fields decordated with ConfigPropertyNameAttribute to their defaults, if necessary.
+        /// Sets properties and fields decorated with ConfigPropertyNameAttribute to their defaults, if necessary.
         /// </summary>
-        // TODO(jimwp): Add new function called by this to replace capability in childeren.
+        // TODO(jimwp): Add new function called by this to replace capability in children.
         protected sealed override void BeginProcessing()
         {
             UpdateConfigPropertyNameAttribute();
@@ -229,13 +229,13 @@ namespace Google.PowerShell.Common
         }
 
         /// <summary>
-        /// Checks if the member is a powershell parameter that applys to the currently active parameter set.
+        /// Checks if the member is a PowerShell parameter that applies to the currently active parameter set.
         /// </summary>
         /// <param name="member">
         /// The member of the cmdlet to check.
         /// </param>
         /// <returns>
-        /// True if the member is a powershell parameter of the current parameter set, false otherwise.
+        /// True if the member is a PowerShell parameter of the current parameter set, false otherwise.
         /// </returns>
         private bool IsActiveParameter(MemberInfo member)
         {
@@ -250,10 +250,10 @@ namespace Google.PowerShell.Common
         /// <summary>
         /// Provides a one-time, post-processing functionality for the cmdlet.
         /// </summary>
-        // TODO(jimwp): Seal this and replace with new function for childern to override.
+        // TODO(jimwp): Seal this and replace with new function for children to override.
         protected override void EndProcessing()
         {
-            // EndProcessing is not called if the cmdlet threw an exception or the user cancelled
+            // EndProcessing is not called if the cmdlet threw an exception or the user canceled
             // the execution. We use IDispose.Dispose to perform the final telemetry reporting.
             _cmdletInvocationSuccessful = true;
         }
@@ -372,7 +372,7 @@ namespace Google.PowerShell.Common
             }
             else
             {
-                // TODO(chrsmith): Is it possible to get ahold of any exceptions the
+                // TODO(chrsmith): Is it possible to get a hold of any exceptions the
                 // cmdlet threw? If so, use that to determine a more appropriate error code.
                 // We report 1 instead of 0 so that the data can be see in Google Analytics.
                 // (null vs. 0 is ambiguous in the UI.)
@@ -381,7 +381,7 @@ namespace Google.PowerShell.Common
         }
 
         /// <summary>
-        /// The exeption to be thrown when the parameter set is invalid. Should only be called if the code is
+        /// The exception to be thrown when the parameter set is invalid. Should only be called if the code is
         /// not properly handling all parameter sets.
         /// </summary>
         protected PSInvalidOperationException UnknownParameterSetException =>

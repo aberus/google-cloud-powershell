@@ -32,7 +32,7 @@ namespace Google.PowerShell.PubSub
     ///   <code>PS C:\> New-GcpsTopic -Topic "my-topic" -Subscription "my-subscription" -Project "my-project" -AckDeadline 30</code>
     ///   <para>
     ///   This command creates a new subscription called "my-subscription" that subscribes to "my-topic"
-    ///   in the "my-project" project with an acknowledgement deadline of 30s.
+    ///   in the "my-project" project with an acknowledgment deadline of 30s.
     ///   </para>
     /// </example>
     /// <example>
@@ -435,7 +435,7 @@ namespace Google.PowerShell.PubSub
     /// <summary>
     /// Removes Google Cloud PubSub subscriptions.
     /// <para type="description">
-    /// Removes one or more Gooogle Cloud PubSub subscriptions. Will raise errors if the subscriptions do not exist.
+    /// Removes one or more Google Cloud PubSub subscriptions. Will raise errors if the subscriptions do not exist.
     /// The cmdlet will delete the subscriptions in the default project if -Project is not used.
     /// </para>
     /// <example>
