@@ -82,7 +82,7 @@ namespace Google.PowerShell.PubSub
     /// Retrieves Google Cloud PubSub topics.
     /// </para>
     /// <para type="description">
-    /// Retrieves one or more Gooogle Cloud PubSub topics.
+    /// Retrieves one or more Google Cloud PubSub topics.
     /// If -Topic is not used, the cmdlet will return all the topics under the specified project
     /// (default project if -Project is not used). Otherwise, the cmdlet will return a list of topics
     /// matching the topic names specified in -Topic and will raise an error for any topic that cannot be found.
@@ -167,7 +167,7 @@ namespace Google.PowerShell.PubSub
     /// Removes Google Cloud PubSub topics.
     /// </para>
     /// <para type="description">
-    /// Removes one or more Gooogle Cloud PubSub topics. Will raise errors if the topics do not exist.
+    /// Removes one or more Google Cloud PubSub topics. Will raise errors if the topics do not exist.
     /// The cmdlet will delete the topics in the default project if -Project is not used.
     /// </para>
     /// <example>

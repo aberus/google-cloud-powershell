@@ -134,8 +134,8 @@ namespace Google.PowerShell.CloudStorage
         /// Checks to see if the given object is a folder.
         /// </summary>
         /// <param name="objectName">The name of the object to check.</param>
-        /// <returns>True if the object name is an existant object that ends with "/", or is a prefix for other
-        /// existant objects.</returns>
+        /// <returns>True if the object name is an existent object that ends with "/", or is a prefix for other
+        /// existent objects.</returns>
         public bool IsContainer(string objectName)
         {
             if (_prefixes.ContainsKey(objectName.TrimEnd(Separator)))

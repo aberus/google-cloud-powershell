@@ -76,7 +76,7 @@ namespace Google.PowerShell.Dns
 
         /// <summary>
         /// Returns all resource record sets in zone 'zone' in project 'project'.
-        /// Apply filters if neccessary.
+        /// Apply filters if necessary.
         /// </summary>
         private IEnumerable<ResourceRecordSet> GetResourceRecordSet(string project, string zone, string[] filters)
         {
@@ -135,7 +135,7 @@ namespace Google.PowerShell.Dns
     ///   <code>PS C:\> New-GcdResourceRecordSet -Name "gcloudexample.com." -Rrdata "7.5.7.8" -Type "A" -Ttl 300</code>
     ///   <para>
     ///   Create a new ResourceRecordSet resource with name "gcloudexample.com.", Rrdata ["7.5.7.8"], type "A," and 
-    ///   ttl 300.
+    ///   TTL 300.
     ///   </para>
     /// </example>
     /// <para type="link" uri="(https://cloud.google.com/dns/records/json-record)">
@@ -179,7 +179,7 @@ namespace Google.PowerShell.Dns
 
         /// <summary>
         /// <para type="description">
-        /// Get the ttl, which is the number of seconds the ResourceRecordSet can be cached by resolvers.
+        /// Get the TTL, which is the number of seconds the ResourceRecordSet can be cached by resolvers.
         /// </para>
         /// </summary>
         [Parameter(Position = 3, Mandatory = false)]

@@ -252,7 +252,7 @@ namespace Google.PowerShell.Logging
 
         /// <summary>
         /// <para type="description">
-        /// If specified, the cmdlet will filter out log entries that occur before this datetime.
+        /// If specified, the cmdlet will filter out log entries that occur before this DateTime.
         /// </para>
         /// </summary>
         [Parameter(Mandatory = false)]
@@ -260,7 +260,7 @@ namespace Google.PowerShell.Logging
 
         /// <summary>
         /// <para type="description">
-        /// If specified, the cmdlet will filter out log entries that occur after this datetime.
+        /// If specified, the cmdlet will filter out log entries that occur after this DateTime.
         /// </para>
         /// </summary>
         [Parameter(Mandatory = false)]
@@ -481,7 +481,7 @@ namespace Google.PowerShell.Logging
                 {
                     string descriptorLabelsString = string.Join(", ", descriptorLabels);
                     string errorMessage = $"Label '{labelKey}' cannot be found for monitored resource of type '{selectedType}'."
-                        + $"The available lables are '{descriptorLabelsString}'.";
+                        + $"The available labels are '{descriptorLabelsString}'.";
                     ErrorRecord errorRecord = new ErrorRecord(
                         new ArgumentException(errorMessage),
                         "InvalidLabel",
@@ -689,7 +689,7 @@ namespace Google.PowerShell.Logging
     /// </para>
     /// <para type="description">
     /// Lists Stackdriver logs' names from a project. Will display logs' names from the default project if -Project is not used.
-    /// A log is a named collection of log entries within the project (any log mus thave at least 1 log entry).
+    /// A log is a named collection of log entries within the project (any log must have at least 1 log entry).
     /// To get log entries from a particular log, use Get-GcLogEntry cmdlet instead.
     /// </para>
     /// <example>

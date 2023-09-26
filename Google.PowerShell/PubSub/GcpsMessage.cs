@@ -45,7 +45,7 @@ namespace Google.PowerShell.PubSub
     ///   <code>PS C:\> Get-GcpsMessage -Subscription "my-subscription" -AutoAck</code>
     ///   <para>
     ///   This command pulls down one or more messages from the subscription "my-subscription" in the default project
-    ///   and sends an acknowledgement for each message.
+    ///   and sends an acknowledgment for each message.
     ///   </para>
     /// </example>
     /// <para type="link" uri="(https://cloud.google.com/pubsub/docs/reference/rest/v1/PubsubMessage)">
@@ -91,7 +91,7 @@ namespace Google.PowerShell.PubSub
 
         /// <summary>
         /// <para type="description">
-        /// If set, automatically send acknowledgement for each message received.
+        /// If set, automatically send acknowledgment for each message received.
         /// </para>
         /// </summary>
         [Parameter(Mandatory = false)]
@@ -138,7 +138,7 @@ namespace Google.PowerShell.PubSub
                 return;
             }
 
-            // Send acknowledgement for all the messages if -AutoAck is present.
+            // Send acknowledgment for all the messages if -AutoAck is present.
             if (AutoAck.IsPresent)
             {
                 AcknowledgeRequest ackRequestBody = new AcknowledgeRequest()
@@ -460,7 +460,7 @@ namespace Google.PowerShell.PubSub
 
         /// <summary>
         /// <para type="description">
-        /// The list of PubSub messages that the cmdlet will send acknowledgement for.
+        /// The list of PubSub messages that the cmdlet will send acknowledgment for.
         /// </para>
         /// </summary>
         [Parameter(Mandatory = true, ValueFromPipeline = true, ParameterSetName = ParameterSetNames.ByObject)]
@@ -495,25 +495,25 @@ namespace Google.PowerShell.PubSub
 
     /// <summary>
     /// <para type="synopsis">
-    /// Sends acknowledgement for one or more PubSub messages.
+    /// Sends acknowledgment for one or more PubSub messages.
     /// </para>
     /// <para type="description">
-    /// Sends acknowledgement for one or more PubSub messages. Will raise errors if the subscription that the messages are pulled from
+    /// Sends acknowledgment for one or more PubSub messages. Will raise errors if the subscription that the messages are pulled from
     /// does not exist. The cmdlet will search for the subscription and the messages in the default project if -Project is not used.
-    /// To send acknowledgement for messages from a single subscription, use -Subscription to provide the name of the subscription
-    /// and -AckId to provide a list of Ack Ids for that subscription. To send acknowledgement for messages objects returned by
+    /// To send acknowledgment for messages from a single subscription, use -Subscription to provide the name of the subscription
+    /// and -AckId to provide a list of Ack Ids for that subscription. To send acknowledgment for messages objects returned by
     /// Get-GcpsMessage cmdlet, use the -InputObject parameter.
     /// </para>
     /// <example>
     ///   <code>PS C:\> Send-GcpsAck -Subscription "my-subscription" -AckId "ackId"</code>
     ///   <para>
-    ///   This command sends acknowledgement for message with Ack Id "ackId" from subscription "my-subscription" in the default project.
+    ///   This command sends acknowledgment for message with Ack Id "ackId" from subscription "my-subscription" in the default project.
     ///   </para>
     /// </example>
     /// <example>
     ///   <code>PS C:\> Send-GcpsAck -Subscription "my-subscription" -AckId "ackId1", "ackId2" -Project "my-project"</code>
     ///   <para>
-    ///   This command sends acknowledgement for messages with Ack Ids "ackId1" and "ackId2" from subscription"my-subscription"
+    ///   This command sends acknowledgment for messages with Ack Ids "ackId1" and "ackId2" from subscription"my-subscription"
     ///   in the project "my-project".
     ///   </para>
     /// </example>
@@ -523,7 +523,7 @@ namespace Google.PowerShell.PubSub
     ///   PS C:\> Send-GcpsAck -InputObject $messages
     ///   </code>
     ///   <para>
-    ///   This command sends acknowledgement for messages pulled from subscription "my-subscription"
+    ///   This command sends acknowledgment for messages pulled from subscription "my-subscription"
     ///   </para>
     /// </example>
     /// <para type="link" uri="(https://cloud.google.com/pubsub/docs/subscriber#receiving-pull-messages)">
@@ -555,20 +555,20 @@ namespace Google.PowerShell.PubSub
 
     /// <summary>
     /// <para type="synopsis">
-    /// Setting acknowledgement deadline in seconds for one or more PubSub messages.
+    /// Setting acknowledgment deadline in seconds for one or more PubSub messages.
     /// </para>
     /// <para type="description">
-    /// Setting acknowledgement deadline in seconds for one or more PubSub messages.
+    /// Setting acknowledgment deadline in seconds for one or more PubSub messages.
     /// Will raise errors if the subscription that the messages are pulled from does not exist.
     /// The cmdlet will search for the subscription and the messages in the default project if -Project is not used.
-    /// To set the acknowledgement deadline for messages from a single subscription, use -Subscription to provide the name of the subscription
-    /// and -AckId to provide a list of Ack Ids for that subscription. To send acknowledgement for messages objects returned by
+    /// To set the acknowledgment deadline for messages from a single subscription, use -Subscription to provide the name of the subscription
+    /// and -AckId to provide a list of Ack Ids for that subscription. To send acknowledgment for messages objects returned by
     /// Get-GcpsMessage cmdlet, use the -InputObject parameter.
     /// </para>
     /// <example>
     ///   <code>PS C:\> Set-GcpsAckDeadline -Subscription "my-subscription" -AckId "ackId" -AckDeadline 10</code>
     ///   <para>
-    ///   This command sets the acknowledgement deadline for message with Ack Id "ackId" from subscription "my-subscription"
+    ///   This command sets the acknowledgment deadline for message with Ack Id "ackId" from subscription "my-subscription"
     ///   in the default project to 10s.
     ///   </para>
     /// </example>
@@ -578,7 +578,7 @@ namespace Google.PowerShell.PubSub
     ///                 -AckId "ackId1", "ackId2" -Project "my-project" -AckDeadline 10
     ///   </code>
     ///   <para>
-    ///   This command sets the acknowledgement deadline for messages with Ack Ids "ackId1" and "ackId2" from subscription
+    ///   This command sets the acknowledgment deadline for messages with Ack Ids "ackId1" and "ackId2" from subscription
     ///   "my-subscription" in the project "my-project" to 10s.
     ///   </para>
     /// </example>
@@ -588,11 +588,11 @@ namespace Google.PowerShell.PubSub
     ///   PS C:\> Set-GcpsAckDeadline -InputObject $messages -AckDeadline 10
     ///   </code>
     ///   <para>
-    ///   This command sets the acknowledgement deadline for messages pulled from subscription "my-subscription" to 10s.
+    ///   This command sets the acknowledgment deadline for messages pulled from subscription "my-subscription" to 10s.
     ///   </para>
     /// </example>
     /// <para type="link" uri="(https://cloud.google.com/pubsub/docs/subscriber#ack_deadline)">
-    /// [Pull Messages Acknowledgement Deadline]
+    /// [Pull Messages Acknowledgment Deadline]
     /// </para>
     /// </summary>
     [Cmdlet(VerbsCommon.Set, "GcpsAckDeadline")]

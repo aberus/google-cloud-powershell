@@ -155,7 +155,7 @@ namespace Google.PowerShell.Logging
 
         /// <summary>
         /// <para type="description">
-        /// The name of the Google BigQuery dataset that the the sink will export the log entries to.
+        /// The name of the Google BigQuery dataset that the sink will export the log entries to.
         /// </para>
         /// </summary>
         [Parameter(Mandatory = true, ParameterSetName = ParameterSetNames.BigQueryDataSetDestination)]
@@ -164,7 +164,7 @@ namespace Google.PowerShell.Logging
 
         /// <summary>
         /// <para type="description">
-        /// The name of the Google PubSub topic that the the sink will export the log entries to.
+        /// The name of the Google PubSub topic that the sink will export the log entries to.
         /// </para>
         /// </summary>
         [Parameter(Mandatory = true, ParameterSetName = ParameterSetNames.PubSubTopicDestination)]
@@ -371,7 +371,7 @@ namespace Google.PowerShell.Logging
 
         /// <summary>
         /// <para type="description">
-        /// The name of the Google BigQuery dataset that the the sink will export the log entries to.
+        /// The name of the Google BigQuery dataset that the sink will export the log entries to.
         /// </para>
         /// </summary>
         [Parameter(Mandatory = false, ParameterSetName = ParameterSetNames.BigQueryDataSetDestination)]
@@ -380,7 +380,7 @@ namespace Google.PowerShell.Logging
 
         /// <summary>
         /// <para type="description">
-        /// The name of the Google PubSub topic that the the sink will export the log entries to.
+        /// The name of the Google PubSub topic that the sink will export the log entries to.
         /// </para>
         /// </summary>
         [Parameter(Mandatory = false, ParameterSetName = ParameterSetNames.PubSubTopicDestination)]

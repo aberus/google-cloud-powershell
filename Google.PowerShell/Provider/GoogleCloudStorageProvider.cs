@@ -27,7 +27,7 @@ using ProjectListRequest = Google.Apis.CloudResourceManager.v1.ProjectsResource.
 namespace Google.PowerShell.Provider
 {
     /// <summary>
-    /// A powershell provider that connects to Google Cloud Storage.
+    /// A PowerShell provider that connects to Google Cloud Storage.
     /// </summary>
     [CmdletProvider(ProviderName, ProviderCapabilities.ShouldProcess)]
     public class GoogleCloudStorageProvider : NavigationCmdletProvider, IContentCmdletProvider
@@ -37,15 +37,34 @@ namespace Google.PowerShell.Provider
         /// </summary>
         public class GcsGetContentWriterDynamicParameters
         {
+            /// <summary>
+            /// <para type="description">
+            /// Content type of the Cloud Storage object. e.g. "image/png" or "text/plain".
+            /// </para>
+            /// <para type="description">
+            /// For file uploads, the type will be inferred based on the file extension, defaulting to
+            /// "application/octet-stream" if no match is found. When passing object content via the
+            /// -Contents parameter, the type will default to "text/plain; charset=utf-8".
+            /// </para>
+            /// </summary>
             [Parameter]
             public string ContentType { get; set; }
         }
 
         /// <summary>
-        /// Dynamic paramters for Copy-Item.
+        /// Dynamic parameters for Copy-Item.
         /// </summary>
         public class GcsCopyItemDynamicParameters
         {
+            /// <summary>
+            /// <para type="description">
+            /// Provide a predefined ACL to the object. e.g. "publicRead" where the project owner gets
+            /// OWNER access, and allUsers get READER access.
+            /// </para>
+            /// <para type="description">
+            /// See: https://cloud.google.com/storage/docs/json_api/v1/objects/insert
+            /// </para>
+            /// </summary>
             [Parameter]
             public ObjectsResource.CopyRequest.DestinationPredefinedAclEnum? DestinationAcl { get; set; }
 
@@ -54,7 +73,7 @@ namespace Google.PowerShell.Provider
         }
 
         /// <summary>
-        /// Dynamic paramters for New-Item with an object path.
+        /// Dynamic parameters for New-Item with an object path.
         /// </summary>
         public class NewGcsObjectDynamicParameters
         {
@@ -94,7 +113,7 @@ namespace Google.PowerShell.Provider
         }
 
         /// <summary>
-        /// Dynamic paramters for New-Item with a bucket path.
+        /// Dynamic parameters for New-Item with a bucket path.
         /// </summary>
         public class NewGcsBucketDynamicParameters
         {
@@ -340,7 +359,7 @@ namespace Google.PowerShell.Provider
         }
 
         /// <summary>
-        /// Checks if a path is a legal string of characters. Shoudl pretty much always return null.
+        /// Checks if a path is a legal string of characters. Should pretty much always return null.
         /// </summary>
         /// <param name="path">The path to check.</param>
         /// <returns>True if GcsPath.Parse() can parse it.</returns>
@@ -554,7 +573,7 @@ namespace Google.PowerShell.Provider
         /// Writes the object descriptions of the items in the container to the output. Used by Get-ChildItem.
         /// </summary>
         /// <param name="path">The path of the container.</param>
-        /// <param name="recurse">If true, get all descendents of the container, not just immediate children.</param>
+        /// <param name="recurse">If true, get all descendants of the container, not just immediate children.</param>
         protected override void GetChildItems(string path, bool recurse)
         {
             GcsPath gcsPath = GcsPath.Parse(path);
@@ -591,7 +610,7 @@ namespace Google.PowerShell.Provider
         /// <summary>
         /// Creates a new item at the given path.
         /// </summary>
-        /// <param name="path">The path of the item ot create.</param>
+        /// <param name="path">The path of the item to create.</param>
         /// <param name="itemTypeName">The type of item to create. "Directory" is the only special one.
         /// That will create an object with a name ending in "/".</param>
         /// <param name="newItemValue">The value of the item to create. We assume it is a string.</param>
@@ -652,14 +671,14 @@ namespace Google.PowerShell.Provider
         /// </summary>
         /// <param name="path">The path to copy from.</param>
         /// <param name="copyPath">The path to copy to.</param>
-        /// <param name="recurse">If true, will copy all decendent objects as well.</param>
+        /// <param name="recurse">If true, will copy all descendant objects as well.</param>
         protected override void CopyItem(string path, string copyPath, bool recurse)
         {
             if (!ShouldProcess($"Copy-Item from {path} to {copyPath}"))
             {
                 return;
             }
-            var dyanmicParameters = (GcsCopyItemDynamicParameters)DynamicParameters;
+            var dynamicParameters = (GcsCopyItemDynamicParameters)DynamicParameters;
             if (recurse)
             {
                 char directorySeparator = Path.DirectorySeparatorChar;
@@ -677,8 +696,8 @@ namespace Google.PowerShell.Provider
                     string destinationObject = GcsPath.Parse(MakePath(copyPath, objectSubPath)).ObjectPath;
                     ObjectsResource.CopyRequest childRequest = Service.Objects.Copy(null, child.Bucket,
                         child.Name, gcsCopyPath.Bucket, destinationObject);
-                    childRequest.SourceGeneration = dyanmicParameters.SourceGeneration;
-                    childRequest.DestinationPredefinedAcl = dyanmicParameters.DestinationAcl;
+                    childRequest.SourceGeneration = dynamicParameters.SourceGeneration;
+                    childRequest.DestinationPredefinedAcl = dynamicParameters.DestinationAcl;
                     childRequest.Projection = ObjectsResource.CopyRequest.ProjectionEnum.Full;
                     Object childObject = childRequest.Execute();
                     bool isContainer = (new GcsPath(childObject).Type != GcsPath.GcsPathType.Object);
@@ -691,8 +710,8 @@ namespace Google.PowerShell.Provider
                 ObjectsResource.CopyRequest request =
                     Service.Objects.Copy(null, gcsPath.Bucket, gcsPath.ObjectPath, gcsCopyPath.Bucket,
                         gcsCopyPath.ObjectPath);
-                request.SourceGeneration = dyanmicParameters.SourceGeneration;
-                request.DestinationPredefinedAcl = dyanmicParameters.DestinationAcl;
+                request.SourceGeneration = dynamicParameters.SourceGeneration;
+                request.DestinationPredefinedAcl = dynamicParameters.DestinationAcl;
                 request.Projection = ObjectsResource.CopyRequest.ProjectionEnum.Full;
                 Object response = request.Execute();
                 WriteItemObject(response, copyPath, gcsCopyPath.Type != GcsPath.GcsPathType.Object);
@@ -711,7 +730,7 @@ namespace Google.PowerShell.Provider
 
         /// <summary>
         /// Gets a content reader to read the contents of a downloaded Google Cloud Storage object.
-        /// Used by Get-Contents.
+        /// Used by Get-Content.
         /// </summary>
         /// <param name="path">The path to the object to read.</param>
         /// <returns>A content reader of the contents of a given object.</returns>
@@ -817,7 +836,7 @@ namespace Google.PowerShell.Provider
         /// Deletes a Google Cloud Storage object or bucket. Used by Remove-Item.
         /// </summary>
         /// <param name="path">The path to the object or bucket to remove.</param>
-        /// <param name="recurse">If true, will remove the desendants of the item as well. Required for a
+        /// <param name="recurse">If true, will remove the descendants of the item as well. Required for a
         /// non-empty bucket.</param>
         protected override void RemoveItem(string path, bool recurse)
         {
@@ -920,7 +939,7 @@ namespace Google.PowerShell.Provider
         }
 
         /// <summary>
-        /// Waits on the list of delete tasks to compelete, updating progress as it does so.
+        /// Waits on the list of delete tasks to complete, updating progress as it does so.
         /// </summary>
         private void WaitDeleteTasks(List<Task<string>> deleteTasks)
         {
@@ -1103,7 +1122,7 @@ namespace Google.PowerShell.Provider
                 ListProjectsResponse projects = request.Execute();
                 foreach (Project project in projects.Projects ?? Enumerable.Empty<Project>())
                 {
-                    // The Storage Service considers invactive projects to not exist.
+                    // The Storage Service considers inactive projects to not exist.
                     if (project.LifecycleState == "ACTIVE")
                     {
                         yield return project;
