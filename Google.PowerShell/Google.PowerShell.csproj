@@ -154,6 +154,7 @@
     <Compile Include="CloudResourceManager\GoogleCloudProjectCmdlets.cs" />
     <Compile Include="CloudResourceManager\IamPolicyCmdlets.cs" />
     <Compile Include="Common\ActiveUserConfig.cs" />
+    <Compile Include="Common\GCloudMetadataClient.cs" />
     <Compile Include="Common\JsonExtensions.cs" />
     <Compile Include="Common\TokenResponse.cs" />
     <Compile Include="Common\AuthenticateWithSdkCredentialsExecutor.cs" />

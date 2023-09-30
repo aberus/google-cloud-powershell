@@ -1590,7 +1590,7 @@ namespace Google.PowerShell.Sql
                         prop.SetValue(newSettings, entry.Value);
                     }
                 }
-            };
+            }
             return newSettings;
         }
     }
@@ -1717,7 +1717,7 @@ namespace Google.PowerShell.Sql
 
             // Wait for recreate operation in failover replica.
             OperationsResource.ListRequest opListRequest =
-                Service.Operations.List(projectName, instanceObject.FailoverReplica.Name);
+                Service.Operations.List(projectName);
             WriteVerbose("Waiting for the Failover to be re-created.");
             do
             {

@@ -1,6 +1,7 @@
 ﻿// Copyright 2015-2016 Google Inc. All Rights Reserved.
 // Licensed under the Apache License Version 2.0.
 
+using Google.Apis.Auth.OAuth2;
 using Google.Apis.CloudResourceManager.v1;
 using Google.Apis.CloudResourceManager.v1.Data;
 using Google.Apis.Services;
@@ -66,9 +67,20 @@ namespace Google.PowerShell.Common
         {
             return new BaseClientService.Initializer()
             {
-                HttpClientInitializer = new AuthenticateWithSdkCredentialsExecutor(),
+                //HttpClientInitializer = new AuthenticateWithSdkCredentialsExecutor(),
+                HttpClientInitializer = GetCredential(),
                 ApplicationName = "google-cloud-powershell",
             };
+        }
+
+        protected static GoogleCredential GetCredential()
+        {
+            GoogleCredential credential = GoogleCredential.GetApplicationDefault();
+            if (credential.IsCreateScopedRequired)
+            {
+                credential = credential.CreateScoped(CloudResourceManagerService.Scope.CloudPlatform);
+            }
+            return credential;
         }
 
         /// <summary>
@@ -331,7 +343,7 @@ namespace Google.PowerShell.Common
         }
 
         /// <summary>
-        /// Returns a project number based on a project ID.
+        /// Returns a project number.
         /// </summary>
         protected string GetProjectNumber(string projectId)
         {

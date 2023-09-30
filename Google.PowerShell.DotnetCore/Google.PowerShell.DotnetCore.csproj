@@ -4,7 +4,7 @@
     <Description>Google Cloud Tools for PowerShell, targeting the .NET Core runtime</Description>
     <Copyright>Google Inc. 2017</Copyright>
     <AssemblyTitle>Google Cloud Tools for PowerShell</AssemblyTitle>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
     <AssemblyName>Google.PowerShell</AssemblyName>
     <PackageId>Google.PowerShell.DotnetCore</PackageId>
@@ -28,8 +28,8 @@
     <DefineConstants>$(DefineConstants);UNIX</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <PackageReference Include="System.Management.Automation" Version="6.0.0-alpha17" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="All" />
     <PackageReference Include="Google.Api.Gax" Version="2.1.0" />
     <PackageReference Include="Google.Api.Gax.Rest" Version="2.1.0" />
     <PackageReference Include="Google.Apis" Version="1.29.1" />
