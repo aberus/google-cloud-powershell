@@ -1,8 +1,10 @@
 ﻿// Copyright 2015-2016 Google Inc. All Rights Reserved.
 // Licensed under the Apache License Version 2.0.
 
+using Google.Apis.Auth.OAuth2;
 using Google.Apis.CloudResourceManager.v1;
 using Google.Apis.CloudResourceManager.v1.Data;
+using Google.Apis.Http;
 using Google.Apis.Services;
 using Microsoft.PowerShell.Commands;
 using System;
@@ -69,9 +71,25 @@ namespace Google.PowerShell.Common
         {
             return new BaseClientService.Initializer()
             {
-                HttpClientInitializer = new AuthenticateWithSdkCredentialsExecutor(),
+                HttpClientInitializer = GetCredential(),
                 ApplicationName = "google-cloud-powershell",
             };
+        }
+
+        protected static ICredential GetCredential()
+        {
+            try
+            {
+                GoogleCredential credential = GoogleCredential.GetApplicationDefault();
+                if (credential.IsCreateScopedRequired)
+                {
+                    credential = credential.CreateScoped(CloudResourceManagerService.Scope.CloudPlatform);
+                }
+                return credential;
+            }
+            catch(InvalidOperationException ex) when(ex.Message.StartsWith("Your default credentials were not found.")) { }
+
+            return new AuthenticateWithSdkCredentialsExecutor();
         }
 
         /// <summary>
