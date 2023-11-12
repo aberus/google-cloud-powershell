@@ -13,6 +13,7 @@ using System.IO;
 using System.Management.Automation;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using OperationsResource = Google.Apis.SQLAdmin.v1beta4.OperationsResource;
 
 namespace Google.PowerShell.Sql
 {

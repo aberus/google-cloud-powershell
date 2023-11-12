@@ -33,11 +33,11 @@ namespace Google.PowerShell.Tests.Compute
         {
             Assert.IsFalse(GetGceMetadataCmdlet.Client.DefaultRequestHeaders.Contains(
                 GetGceMetadataCmdlet.MetadataFlavorHeader));
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Get-GceMetadata");
             try
             {
-                Collection<PSObject> results = Pipeline.Invoke();
+                Collection<PSObject> results = PowerShellInstance.Invoke();
             }
             // Exception thrown because we are not running from a VM.
             catch { }
@@ -57,11 +57,11 @@ namespace Google.PowerShell.Tests.Compute
         {
             Assert.IsFalse(GetGceMetadataCmdlet.Client.DefaultRequestHeaders.Contains(
                 GetGceMetadataCmdlet.MetadataFlavorHeader));
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Get-GceMetadata; Get-GceMetadata");
             try
             {
-                Collection<PSObject> results = Pipeline.Invoke();
+                Collection<PSObject> results = PowerShellInstance.Invoke();
             }
             // Exception thrown because we are not running from a VM.
             catch { }
