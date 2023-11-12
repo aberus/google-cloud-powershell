@@ -31,7 +31,7 @@ namespace Google.PowerShell.Tests.Compute
         {
             const string psDiskVar = "attachedDisk";
             const string mockedResultName = "mocked-result-name";
-            Pipeline.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
             Mock<InstancesResource> instances = ServiceMock.Resource(s => s.Instances);
             instances.SetupRequest(
                 i => i.Insert(It.IsAny<Instance>(), It.IsAny<string>(), It.IsAny<string>()),
@@ -40,9 +40,9 @@ namespace Google.PowerShell.Tests.Compute
                 i => i.Get(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
                 new Instance { Name = mockedResultName });
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Add-GceInstance -Name instance-name -Disk ${psDiskVar} -CustomCpu 2 -CustomMemory 2048");
-            Collection<PSObject> results = Pipeline.Invoke();
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             instances.Verify(
                 resource => resource.Insert(
@@ -62,7 +62,7 @@ namespace Google.PowerShell.Tests.Compute
         public void TestErrorAddGceInstance()
         {
             const string psDiskVar = "attachedDisk";
-            Pipeline.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
             Mock<InstancesResource> instances = ServiceMock.Resource(s => s.Instances);
             GoogleApiException apiException = new GoogleApiException("mock-service-name", "mock-error-message");
             apiException.HttpStatusCode = HttpStatusCode.Conflict;
@@ -71,9 +71,9 @@ namespace Google.PowerShell.Tests.Compute
                 i => i.Insert(It.IsAny<Instance>(), It.IsAny<string>(), It.IsAny<string>()),
                 apiException);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Add-GceInstance -Name instance-name -Disk ${psDiskVar}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             // An error should be thrown (if it is a terminating error,
             // we wouldn't even reach this point).
@@ -84,11 +84,11 @@ namespace Google.PowerShell.Tests.Compute
         public void TestErrorMissingCustomMemoryWithCustomCpu()
         {
             const string psDiskVar = "attachedDisk";
-            Pipeline.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Add-GceInstance -Name instance-name -Disk ${psDiskVar} -CustomCpu 2");
-            var e = Assert.Throws<ParameterBindingException>(() => Pipeline.Invoke());
+            var e = Assert.Throws<ParameterBindingException>(() => PowerShellInstance.Invoke());
 
             Assert.AreEqual("CustomMemory", e.ParameterName.Trim());
         }
@@ -97,11 +97,11 @@ namespace Google.PowerShell.Tests.Compute
         public void TestErrorMissingCustomCpuWithCustomMemory()
         {
             const string psDiskVar = "attachedDisk";
-            Pipeline.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Add-GceInstance -Name instance-name -Disk ${psDiskVar} -CustomMemory 2048");
-            var e = Assert.Throws<ParameterBindingException>(() => Pipeline.Invoke());
+            var e = Assert.Throws<ParameterBindingException>(() => PowerShellInstance.Invoke());
 
             Assert.AreEqual("CustomCpu", e.ParameterName.Trim());
         }
@@ -110,11 +110,11 @@ namespace Google.PowerShell.Tests.Compute
         public void TestMachineTypeInvalidWithCustom()
         {
             const string psDiskVar = "attachedDisk";
-            Pipeline.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Add-GceInstance -Name instance-name -Disk ${psDiskVar} -CustomCpu 2 -CustomMemory 2048 -MachineType some-type");
-            var e = Assert.Throws<ParameterBindingException>(() => Pipeline.Invoke());
+            var e = Assert.Throws<ParameterBindingException>(() => PowerShellInstance.Invoke());
 
             Assert.AreEqual("Parameter set cannot be resolved using the specified named parameters.", e.Message);
             Assert.IsNull(e.ParameterName);
@@ -125,7 +125,7 @@ namespace Google.PowerShell.Tests.Compute
         {
             const string psDiskVar = "attachedDisk";
             const string mockedResultName = "mocked-result-name";
-            Pipeline.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(psDiskVar, new AttachedDisk());
             Mock<InstancesResource> instances = ServiceMock.Resource(s => s.Instances);
             instances.SetupRequest(
                 resource => resource.Insert(It.Is<Instance>(
@@ -136,9 +136,9 @@ namespace Google.PowerShell.Tests.Compute
                 i => i.Get(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
                 new Instance { Name = mockedResultName });
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Add-GceInstance -Name instance-name -Disk ${psDiskVar} -Label @{{'key' = 'value'}}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             var instance = (Instance)results.Single().BaseObject;
             Assert.AreEqual(mockedResultName, instance.Name);

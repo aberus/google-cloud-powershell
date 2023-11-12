@@ -35,8 +35,8 @@ namespace Google.PowerShell.Tests.Storage
             Mock<ObjectsResource> objects = ServiceMock.Resource(s => s.Objects);
             objects.SetupRequest(o => o.Get(bucketName, objectName), response);
 
-            Pipeline.Commands.AddScript($"Get-GcsObject -Bucket {bucketName} -ObjectName {objectName}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            PowerShellInstance.Commands.AddScript($"Get-GcsObject -Bucket {bucketName} -ObjectName {objectName}");
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             var result = results.Single().BaseObject as Object;
             Assert.IsNotNull(result);
@@ -53,8 +53,8 @@ namespace Google.PowerShell.Tests.Storage
             Mock<ObjectsResource> objects = ServiceMock.Resource(s => s.Objects);
             objects.SetupRequest(o => o.List(bucketName), new Objects { Items = new[] { response } });
 
-            Pipeline.Commands.AddScript($"Get-GcsObject -Bucket {bucketName}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            PowerShellInstance.Commands.AddScript($"Get-GcsObject -Bucket {bucketName}");
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             var result = results.Single().BaseObject as Object;
             Assert.IsNotNull(result);
@@ -72,8 +72,8 @@ namespace Google.PowerShell.Tests.Storage
                 o => o.Get(bucketName, objectName),
                 new GoogleApiException("service-name", "error-message") { HttpStatusCode = HttpStatusCode.NotFound });
 
-            Pipeline.Commands.AddScript($"Get-GcsObject -Bucket {bucketName} -ObjectName {objectName}");
-            Pipeline.Invoke();
+            PowerShellInstance.Commands.AddScript($"Get-GcsObject -Bucket {bucketName} -ObjectName {objectName}");
+            PowerShellInstance.Invoke();
 
             TestErrorRecord(ErrorCategory.ResourceUnavailable);
         }

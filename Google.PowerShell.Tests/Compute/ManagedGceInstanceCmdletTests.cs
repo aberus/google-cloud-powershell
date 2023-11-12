@@ -71,9 +71,9 @@ namespace Google.PowerShell.Tests.Compute
             instances.SetupRequest(
                   item => item.List(FakeProjectId, FakeRegionName), listResponse);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Get-GceManagedInstanceGroup -Region {FakeRegionName}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            Collection<PSObject> results = PowerShellInstance.Invoke();
             Assert.AreEqual(results.Count, 2);
             InstanceGroupManager firstGroup = results[0]?.BaseObject as InstanceGroupManager;
             InstanceGroupManager secondGroup = results[1]?.BaseObject as InstanceGroupManager;
@@ -95,9 +95,9 @@ namespace Google.PowerShell.Tests.Compute
             instances.SetupRequest(
                   item => item.Get(FakeProjectId, FakeRegionName, instanceGroupName), FirstTestGroup);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Get-GceManagedInstanceGroup -Name {instanceGroupName} -Region {FakeRegionName}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             Assert.AreEqual(results.Count, 1);
             InstanceGroupManager retrievedInstance = results[0].BaseObject as InstanceGroupManager;
@@ -111,9 +111,9 @@ namespace Google.PowerShell.Tests.Compute
         [Test]
         public void TestGetGceManagedInstanceGroupByNameError()
         {
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Get-GceManagedInstanceGroup -Name instance -Region {FakeRegionName} -Zone {FakeZoneName}");
-            var error = Assert.Throws<CmdletInvocationException>(() => Pipeline.Invoke());
+            var error = Assert.Throws<CmdletInvocationException>(() => PowerShellInstance.Invoke());
 
             Assert.AreEqual("Parameters -Region and -Zone cannot be used together with -Name.",
                 error.Message);
@@ -131,9 +131,9 @@ namespace Google.PowerShell.Tests.Compute
             instances.SetupRequest(
                   item => item.Delete(FakeProjectId, FakeRegionName, instanceGroupName), DoneOperation);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Remove-GceManagedInstanceGroup -Name {instanceGroupName} -Region {FakeRegionName}");
-            Pipeline.Invoke();
+            PowerShellInstance.Invoke();
 
             instances.VerifyAll();
         }
@@ -164,16 +164,16 @@ namespace Google.PowerShell.Tests.Compute
                 CreateRegionalInstanceGroup(instanceGroupName, FakeProjectId, FakeRegionName);
 
             string managedRegionVar = "managedRegion";
-            Pipeline.Runspace.SessionStateProxy.SetVariable(managedRegionVar, regionalInstanceGroup);
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(managedRegionVar, regionalInstanceGroup);
 
             Mock<RegionInstanceGroupManagersResource> instances =
                   ServiceMock.Resource(s => s.RegionInstanceGroupManagers);
             instances.SetupRequest(
                   item => item.Delete(FakeProjectId, FakeRegionName, instanceGroupName), DoneOperation);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"${managedRegionVar} | Remove-GceManagedInstanceGroup");
-            Pipeline.Invoke();
+            PowerShellInstance.Invoke();
 
             instances.VerifyAll();
         }
@@ -194,16 +194,16 @@ namespace Google.PowerShell.Tests.Compute
             };
 
             string managedRegionVar = "managedRegion";
-            Pipeline.Runspace.SessionStateProxy.SetVariable(managedRegionVar, regionalInstanceGroup);
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(managedRegionVar, regionalInstanceGroup);
 
             Mock<InstanceGroupManagersResource> instances =
                   ServiceMock.Resource(s => s.InstanceGroupManagers);
             instances.SetupRequest(
                   item => item.Delete(FakeProjectId, FakeZoneName, instanceGroupName), DoneOperation);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"${managedRegionVar} | Remove-GceManagedInstanceGroup");
-            Pipeline.Invoke();
+            PowerShellInstance.Invoke();
 
             instances.VerifyAll();
         }
@@ -227,9 +227,9 @@ namespace Google.PowerShell.Tests.Compute
                 i => i.Get(FakeProjectId, FakeRegionName, instanceGroupName),
                 new InstanceGroupManager { Name = instanceGroupName });
 
-            Pipeline.Commands.AddScript($"Add-GceManagedInstanceGroup -Name {instanceGroupName} " +
+            PowerShellInstance.Commands.AddScript($"Add-GceManagedInstanceGroup -Name {instanceGroupName} " +
                 $"-InstanceTemplate {templateName} -TargetSize 1 -Region {FakeRegionName}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             instances.Verify(
                 resource => resource.Insert(
@@ -250,7 +250,7 @@ namespace Google.PowerShell.Tests.Compute
         {
             string managedRegionObject = "managedRegionObj";
             string instanceGroupName = FirstTestGroup.Name;
-            Pipeline.Runspace.SessionStateProxy.SetVariable(managedRegionObject, FirstTestGroup);
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(managedRegionObject, FirstTestGroup);
 
             Mock<RegionInstanceGroupManagersResource> instances =
                   ServiceMock.Resource(s => s.RegionInstanceGroupManagers);
@@ -263,9 +263,9 @@ namespace Google.PowerShell.Tests.Compute
                 i => i.Get(FakeProjectId, FakeRegionName, FirstTestGroup.Name),
                 FirstTestGroup);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"${managedRegionObject} | Add-GceManagedInstanceGroup -Region {FakeRegionName}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             instances.Verify(
                 resource => resource.Insert(
@@ -291,7 +291,7 @@ namespace Google.PowerShell.Tests.Compute
                 CreateRegionalInstanceGroup(instanceGroupName, FakeProjectId, instanceRegionName);
 
             string managedRegionObject = "managedRegionObj";
-            Pipeline.Runspace.SessionStateProxy.SetVariable(managedRegionObject, regionalInstanceGroup);
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(managedRegionObject, regionalInstanceGroup);
 
             Mock<RegionInstanceGroupManagersResource> instances =
                   ServiceMock.Resource(s => s.RegionInstanceGroupManagers);
@@ -304,9 +304,9 @@ namespace Google.PowerShell.Tests.Compute
                 i => i.Get(FakeProjectId, instanceRegionName, instanceGroupName),
                 regionalInstanceGroup);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"${managedRegionObject} | Add-GceManagedInstanceGroup -Region {instanceRegionName}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             instances.Verify(
                 resource => resource.Insert(
@@ -328,12 +328,12 @@ namespace Google.PowerShell.Tests.Compute
         {
             string managedRegionObject = "managedRegionObj";
             string instanceGroupName = FirstTestGroup.Name;
-            Pipeline.Runspace.SessionStateProxy.SetVariable(managedRegionObject, FirstTestGroup);
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(managedRegionObject, FirstTestGroup);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"${managedRegionObject} | Add-GceManagedInstanceGroup -Region " +
                 $"{FakeRegionName} -Zone {FakeZoneName}");
-            var error = Assert.Throws<CmdletInvocationException>(() => Pipeline.Invoke());
+            var error = Assert.Throws<CmdletInvocationException>(() => PowerShellInstance.Invoke());
 
             Assert.AreEqual("Parameters -Region and -Zone cannot be used together with -Object.",
                 error.Message);
@@ -357,10 +357,10 @@ namespace Google.PowerShell.Tests.Compute
                 i => i.Get(FakeProjectId, FakeZoneName, instanceGroupName),
                 FirstTestGroup);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Add-GceManagedInstanceGroup -Name {instanceGroupName} " +
                 $"-InstanceTemplate template -TargetSize 1");
-            Collection<PSObject> results = Pipeline.Invoke();
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             instances.Verify(
                 resource => resource.Insert(
@@ -390,10 +390,10 @@ namespace Google.PowerShell.Tests.Compute
                 i => i.Get(FakeProjectId, FakeRegionName, instanceGroupName),
                 FirstTestGroup);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Set-GceManagedInstanceGroup -Name {instanceGroupName} -Region {FakeRegionName}" +
                 $" -Abandon -InstanceUri {instanceUri}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             instances.Verify(
                 resource => resource.AbandonInstances(
@@ -424,10 +424,10 @@ namespace Google.PowerShell.Tests.Compute
                 i => i.Get(FakeProjectId, FakeRegionName, instanceGroupName),
                 FirstTestGroup);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Set-GceManagedInstanceGroup -Name {instanceGroupName} -Region {FakeRegionName}" +
                 $" -Size {newSize}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             instances.Verify(
                 resource => resource.Resize(
@@ -446,10 +446,10 @@ namespace Google.PowerShell.Tests.Compute
         [Test]
         public void TestSetGceManagedInstanceGroupError()
         {
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Set-GceManagedInstanceGroup -Name instance-group -Region {FakeRegionName}" +
                 $" -Zone {FakeZoneName} -Size 5");
-            var error = Assert.Throws<CmdletInvocationException>(() => Pipeline.Invoke());
+            var error = Assert.Throws<CmdletInvocationException>(() => PowerShellInstance.Invoke());
 
             Assert.AreEqual("Parameters -Region and -Zone cannot be used together.",
                 error.Message);
@@ -477,9 +477,9 @@ namespace Google.PowerShell.Tests.Compute
                   item => item.ListManagedInstances(FakeProjectId, FakeRegionName, instanceGroupName),
                   listResponse);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"Wait-GceManagedInstanceGroup -Name {instanceGroupName} -Region {FakeRegionName}");
-            Pipeline.Invoke();
+            PowerShellInstance.Invoke();
 
             instances.VerifyAll();
         }
@@ -504,7 +504,7 @@ namespace Google.PowerShell.Tests.Compute
                 CreateRegionalInstanceGroup(instanceGroupName, FakeProjectId, FakeRegionName);
 
             string managedRegionVar = "managedRegion";
-            Pipeline.Runspace.SessionStateProxy.SetVariable(managedRegionVar, regionalInstanceGroup);
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(managedRegionVar, regionalInstanceGroup);
 
             Mock<RegionInstanceGroupManagersResource> instances =
                   ServiceMock.Resource(s => s.RegionInstanceGroupManagers);
@@ -512,9 +512,9 @@ namespace Google.PowerShell.Tests.Compute
                   item => item.ListManagedInstances(FakeProjectId, FakeRegionName, instanceGroupName),
                   listResponse);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"${managedRegionVar} | Wait-GceManagedInstanceGroup");
-            Pipeline.Invoke();
+            PowerShellInstance.Invoke();
 
             instances.VerifyAll();
         }
@@ -544,7 +544,7 @@ namespace Google.PowerShell.Tests.Compute
             };
 
             string managedRegionVar = "managedRegion";
-            Pipeline.Runspace.SessionStateProxy.SetVariable(managedRegionVar, regionalInstanceGroup);
+            PowerShellInstance.Runspace.SessionStateProxy.SetVariable(managedRegionVar, regionalInstanceGroup);
 
             Mock<InstanceGroupManagersResource> instances =
                   ServiceMock.Resource(s => s.InstanceGroupManagers);
@@ -552,9 +552,9 @@ namespace Google.PowerShell.Tests.Compute
                   item => item.ListManagedInstances(FakeProjectId, FakeZoneName, instanceGroupName),
                   listResponse);
 
-            Pipeline.Commands.AddScript(
+            PowerShellInstance.Commands.AddScript(
                 $"${managedRegionVar} | Wait-GceManagedInstanceGroup");
-            Pipeline.Invoke();
+            PowerShellInstance.Invoke();
 
             instances.VerifyAll();
         }

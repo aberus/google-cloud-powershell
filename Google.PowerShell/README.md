@@ -1,42 +1,67 @@
-﻿# Google.PowerShell
+# Google.PowerShell
 
-This assembly contains the cmdlets for manipulating Google Cloud Platform resources from PowerShell.
+This assembly contains the cmdlets for manipulating Google Cloud Platform resources from PowerShell running on .NET Core.
 
-# Building and Debugging
+# Building
 
-Debugging the `Google.PowerShell.dll` library can be done by pressing F5 within Visual Studio. This
-will start the Power Shell with the Visual Studio debugger attached.
+## On Windows
 
-To enable F5 running, edit the project properties and on build launch external program:
+First, you will have to install [.NET Core SDK](https://www.microsoft.com/net/core#windows).
 
-    C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+Then run the following commands in PowerShell:
 
-Set the command-line arguments:
+```
+cd .\Google.PowerShell.DotnetCore
+dotnet restore
+dotnet publish -r win10-x64 (or win81-x64 for Windows 8.1 and Windows Server 2012 R2)
+```
 
-    -noexit -command "&{ import-module .\Google.PowerShell.dll -verbose }"
+The published folder will be returned on the terminal. Typically, this would be ```bin\Debug\netstandard1.6\win10-x64\publish``` or ```bin\Debug\netstandard1.6\win81-x64\publish```, depending on your runtime.
 
-## gsutil ##
+To run the module, you will first need to install [PowerShell Core](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/windows.md#msi). After installing, run:
+```
+& "$env:ProgramFiles\PowerShell\<PowerShellVersion>\powershell.exe```"
+Import-Module "<ProjectDirectory>\Google.PowerShell.DotnetCore\bin\Debug\netstandard1.6\win10-x64\publish\Google.PowerShell.dll"
+```
 
-To compare Google Cloud Storage commands with the gsutil tool, add the -D option. This will dump
-HTTP requests which can be inspected to identify the exact request/parameters used. For example:
+## On Mac OS 10.11 (x64)
+First, you will have to install [.NET Core SDK](https://www.microsoft.com/net/core#macos).
 
-    gsutil -D acl get gs://test-bucket/
+Then run the following commands in the terminal:
+```
+cd .\Google.PowerShell.DotnetCore
+dotnet restore
+dotnet publish --runtime osx.10.11-x64 --configuration Linux
+```
 
-# Running Tests
+The published folder will be returned on the terminal. Typically, this would be ```bin\Linux\netstandard1.6\osx.10.11-x64\publish```.
 
-## Unit Tests
+To run the module, you will first need to install [PowerShell Core](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/linux.md#macos-1011). After installing, run:
+```
+powershell
+Import-Module "<ProjectDirectory>\Google.PowerShell.DotnetCore\bin\Linux\netstandard1.6\win10-x64\publish\Google.PowerShell.dll"
+```
 
-The `Google.PowerShell.Tests.dll` unit test library is using NUnit v2.6.4. To run the tests within
-Visual Studio in the Test Explorer window you need to install the `NUnit Test Adapter`. Go to
-`Tools -> Extensions and Updates` and find it on the Visual Studio Gallery.
+## On Ubuntu 16.04 (x64) nad 14.04 (x64)
+First, you will have to install [.NET Core SDK](https://www.microsoft.com/net/core#ubuntu).
 
-Then rebuild the solution, and the Unit Tests should show up in the Test Explorer.
+You will also have to install OpenSSL:
 
-## Integration Tests
+```apt-get install libcurl4-openssl-dev```
 
-The `Google.PowerShell.IntegrationTests` test library is using the Pester PowerShell test framework.
-The tests described there will show up in the Test Explorer window after you install the
-`PowerShell Tools for Visual Studio 2015`. Also through the Visual Studio gallery.
+Then run the following commands in the terminal:
+```
+cd .\Google.PowerShell.DotnetCore
+dotnet restore
+dotnet publish --runtime ubuntu.16.04-x64 --configuration Linux
+OR
+dotnet publish --runtime ubuntu.14.04-x64 --configuration Linux
+```
 
-Note that these integration tests require you to be logged into a Google Cloud Platform account with
-billing enabled, as it will actually perform storage commands. (e.g. creating new Cloud Storage buckets.)
+The published folder will be returned on the terminal. Typically, this would be ```bin\Linux\netstandard1.6\ubuntu.16.04-x64\publish``` or ```bin\Linux\netstandard1.6\ubuntu.14.04-x64\publish```.
+
+To run the module, you will first need to install [PowerShell Core](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/linux.md#ubuntu-1604). After installing, run:
+```
+powershell
+Import-Module "<ProjectDirectory>\Google.PowerShell.DotnetCore\bin\Linux\netstandard1.6\ubuntu.16.04-x64\publish\Google.PowerShell.dll"
+```

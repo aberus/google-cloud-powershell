@@ -1,270 +1,71 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D338C5D3-5FC3-408F-9F7F-D53E7B213505}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Google.PowerShell</RootNamespace>
+    <TargetFrameworks>net462;netstandard2.1</TargetFrameworks>
+    <Company>Google Inc.</Company>
+    <Product>PowerShell tools for the Google Cloud Platform</Product>
+    <AssemblyVersion>1.0.1.10</AssemblyVersion>
+    <FileVersion>1.0.1.10</FileVersion>
+    <Description>PowerShell cmdlets for the Google Cloud Platform</Description>
+    <Copyright>Copyright 2017 Google Inc.  All Rights Reserved.</Copyright>
+    <AssemblyTitle>Google Cloud Tools for PowerShell</AssemblyTitle>
     <AssemblyName>Google.PowerShell</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Google.PowerShell.XML</DocumentationFile>
-    <!-- Don't create warnings for uncommented public members. -->
+    <PackageId>Google.PowerShell</PackageId>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
+
+  <!--<ItemGroup>
+    <Compile Include="..\Google.PowerShell\**\*.cs" Exclude="..\**\bin\**;..\**\obj\**;**\*.xproj;packages\**" />
+  </ItemGroup>-->
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Linux' ">
+    <DefineConstants>$(DefineConstants);UNIX</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Google.PowerShell.XML</DocumentationFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
-      <HintPath>..\packages\BouncyCastle.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Google.Api.Gax, Version=2.1.0.0, Culture=neutral, PublicKeyToken=3ec5ea7f18953e47, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Api.Gax.2.1.0\lib\net45\Google.Api.Gax.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Api.Gax.Rest, Version=2.1.0.0, Culture=neutral, PublicKeyToken=3ec5ea7f18953e47, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Api.Gax.Rest.2.1.0\lib\net45\Google.Api.Gax.Rest.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis, Version=1.29.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.1.29.1\lib\net45\Google.Apis.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Auth, Version=1.29.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Auth.1.29.1\lib\net45\Google.Apis.Auth.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.29.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Auth.1.29.1\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Bigquery.v2, Version=1.29.1.990, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Bigquery.v2.1.29.1.990\lib\net45\Google.Apis.Bigquery.v2.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.CloudResourceManager.v1, Version=1.29.1.1000, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.CloudResourceManager.v1.1.29.1.1000\lib\net45\Google.Apis.CloudResourceManager.v1.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Compute.v1, Version=1.29.1.981, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Compute.v1.1.29.1.981\lib\net45\Google.Apis.Compute.v1.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Container.v1, Version=1.29.1.988, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Container.v1.1.29.1.988\lib\net45\Google.Apis.Container.v1.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Core, Version=1.29.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Core.1.29.1\lib\net45\Google.Apis.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Dns.v1, Version=1.29.1.1001, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Dns.v1.1.29.1.1001\lib\net45\Google.Apis.Dns.v1.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Iam.v1, Version=1.29.1.995, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Iam.v1.1.29.1.995\lib\net45\Google.Apis.Iam.v1.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Logging.v2, Version=1.29.1.999, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Logging.v2.1.29.1.999\lib\net45\Google.Apis.Logging.v2.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.PlatformServices, Version=1.29.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.1.29.1\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Pubsub.v1, Version=1.29.1.991, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Pubsub.v1.1.29.1.991\lib\net45\Google.Apis.Pubsub.v1.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.SQLAdmin.v1beta4, Version=1.29.1.949, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.SQLAdmin.v1beta4.1.29.1.949\lib\net45\Google.Apis.SQLAdmin.v1beta4.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Storage.v1, Version=1.29.1.958, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Storage.v1.1.29.1.958\lib\net45\Google.Apis.Storage.v1.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Cloud.BigQuery.V2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=185c282632e132a0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Cloud.BigQuery.V2.1.0.0-beta18\lib\net45\Google.Cloud.BigQuery.V2.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net, Version=2.0.7.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.7\lib\net45-full\log4net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Interactive.Async, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Interactive.Async.3.1.1\lib\net45\System.Interactive.Async.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Management.Automation.6.1.7601.17515\lib\net45\System.Management.Automation.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Net" />
-    <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Zlib.Portable, Version=1.11.0.0, Culture=neutral, PublicKeyToken=431cba815f6a8b5b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Zlib.Portable.Signed.1.11.0\lib\portable-net4+sl5+wp8+win8+wpa81+MonoTouch+MonoAndroid\Zlib.Portable.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+
+  <ItemGroup><!--Condition=" '$(TargetFramework)' == 'netstandard2.0' "-->
+    <PackageReference Include="Google.Apis.Auth" Version="1.63.0" />
+    <PackageReference Include="Google.Apis.Compute.v1" Version="1.63.0.3218" />
+    <PackageReference Include="Google.Apis.Core" Version="1.63.0" />
+    <PackageReference Include="Google.Apis.Dns.v1" Version="1.63.0.3164" />
+    <PackageReference Include="Google.Apis.SQLAdmin.v1beta4" Version="1.63.0.3223" />
+    <PackageReference Include="Google.Apis.Storage.v1" Version="1.63.0.3222" />
+    <PackageReference Include="Google.Apis.CloudResourceManager.v1" Version="1.63.0.3216" />
+    <PackageReference Include="Google.Apis.Logging.v2" Version="1.63.0.3220" />
+    <PackageReference Include="Google.Apis.Pubsub.v1" Version="1.63.0.3229" />
+    <PackageReference Include="Google.Apis.Bigquery.v2" Version="1.63.0.3202" />
+    <PackageReference Include="Google.Apis.Iam.v1" Version="1.63.0.3220" />
+    <PackageReference Include="Google.Apis.Container.v1" Version="1.63.0.3218" />
+    <PackageReference Include="Google.Cloud.BigQuery.V2" Version="3.4.0" />
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="All" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="BigQuery\BqCmdlet.cs" />
-    <Compile Include="BigQuery\BqJob.cs" />
-    <Compile Include="BigQuery\BqTable.cs" />
-    <Compile Include="BigQuery\BqDataset.cs" />
-    <Compile Include="BigQuery\BqTableRow.cs" />
-    <Compile Include="CloudResourceManager\CloudResourceManagerCmdlets.cs" />
-    <Compile Include="CloudResourceManager\GoogleCloudProjectCmdlets.cs" />
-    <Compile Include="CloudResourceManager\IamPolicyCmdlets.cs" />
-    <Compile Include="Common\ActiveUserConfig.cs" />
-    <Compile Include="Common\GCloudMetadataClient.cs" />
-    <Compile Include="Common\JsonExtensions.cs" />
-    <Compile Include="Common\TokenResponse.cs" />
-    <Compile Include="Common\AuthenticateWithSdkCredentialsExecutor.cs" />
-    <Compile Include="Common\AnalyticsReporter.cs" />
-    <Compile Include="Common\CloudSdkSettings.cs" />
-    <Compile Include="Common\GcloudCmdlet.cs" />
-    <Compile Include="Common\GcloudWrapper.cs" />
-    <Compile Include="Common\Preconditions.cs" />
-    <Compile Include="Common\ProcessUtils.cs" />
-    <Compile Include="Common\ReportCmdletResults.cs" />
-    <Compile Include="Compute\GceAddressCmdlets.cs" />
-    <Compile Include="Compute\GceBackendServiceCmdlets.cs" />
-    <Compile Include="Compute\GceCmdlet.cs" />
-    <Compile Include="Common\GcloudAttributes.cs" />
-    <Compile Include="Compute\GceAttachedDiskConfigCmdlets.cs" />
-    <Compile Include="Compute\GceFirewallCmdlets.cs" />
-    <Compile Include="Compute\GceForwardingRuleCmdlets.cs" />
-    <Compile Include="Compute\GceHealthCheckCmdlets.cs" />
-    <Compile Include="Compute\GceImageCmdlets.cs" />
-    <Compile Include="Compute\GceInstanceCmdlets.cs" />
-    <Compile Include="Compute\GceDisk.cs" />
-    <Compile Include="Compute\GceInstanceConfigCmdlets.cs" />
-    <Compile Include="Compute\GceInstanceDescriptionCmdlet.cs" />
-    <Compile Include="Compute\GceMachineType.cs" />
-    <Compile Include="Compute\GceManagedInstanceGroupCmdlets.cs" />
-    <Compile Include="Compute\GceInstanceTemplateCmdlets.cs" />
-    <Compile Include="Compute\GceMetadataCmdlet.cs" />
-    <Compile Include="Compute\GceNetworkCmdlets.cs" />
-    <Compile Include="Compute\GceRouteCmdlets.cs" />
-    <Compile Include="Compute\GceServiceAccountConfigCmdlets.cs" />
-    <Compile Include="Compute\GceSnapshotCmdlets.cs" />
-    <Compile Include="Compute\GceTargetPoolCmdlets.cs" />
-    <Compile Include="Compute\GceTargetProxyCmdlets.cs" />
-    <Compile Include="Compute\GceUrlMapCmdlets.cs" />
-    <Compile Include="Compute\GoogleComputeOperationException.cs" />
-    <Compile Include="Compute\GceFirewallProtocolCmdlet.cs" />
-    <Compile Include="Compute\InstanceMetadataConverter.cs" />
-    <Compile Include="Container\GkeCmdlet.cs" />
-    <Compile Include="Container\GkeClusterCmdlets.cs" />
-    <Compile Include="Container\GkeNodePoolCmdlets.cs" />
-    <Compile Include="Dns\GcdCmdlet.cs" />
-    <Compile Include="Dns\GcdChange.cs" />
-    <Compile Include="Dns\GcdManagedZone.cs" />
-    <Compile Include="Dns\GcdQuota.cs" />
-    <Compile Include="Dns\GcdResourceRecordSet.cs" />
-    <Compile Include="Logging\GcLogCmdlets.cs" />
-    <Compile Include="Logging\GcLogMetricCmdlets.cs" />
-    <Compile Include="Logging\GcLogSinkCmdlets.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Provider\CacheItem.cs" />
-    <Compile Include="PubSub\GcpsMessage.cs" />
-    <Compile Include="PubSub\GcpsSubscription.cs" />
-    <Compile Include="PubSub\GcpsCmdlet.cs" />
-    <Compile Include="PubSub\GcpsTopic.cs" />
-    <Compile Include="Sql\GcSqlBackupRunCmdlets.cs" />
-    <Compile Include="Sql\GcSqlCmdlet.cs" />
-    <Compile Include="Sql\GcSqlFlagsCmdlet.cs" />
-    <Compile Include="Sql\GcSqlInstanceCmdlets.cs" />
-    <Compile Include="Sql\GcSqlInstanceConfigCmdlets.cs" />
-    <Compile Include="Sql\GcSqlInstanceReplicaConfigCmdlet.cs" />
-    <Compile Include="Sql\GcSqlOperationCmdlet.cs" />
-    <Compile Include="Sql\GcSqlSettingConfigCmdlet.cs" />
-    <Compile Include="Sql\GcSqlSslCmdlets.cs" />
-    <Compile Include="Sql\GcSqlTiersCmdlet.cs" />
-    <Compile Include="Storage\GcsAcl.cs" />
-    <Compile Include="Storage\GcsBucket.cs" />
-    <Compile Include="Storage\GcsBucketLogging.cs" />
-    <Compile Include="Storage\GcsBucketWebsite.cs" />
-    <Compile Include="Storage\GcsCmdlet.cs" />
-    <Compile Include="Storage\GcsObject.cs" />
-    <Compile Include="Provider\BucketModel.cs" />
-    <Compile Include="Provider\GcsContentWriter.cs" />
-    <Compile Include="Provider\GcsStringReader.cs" />
-    <Compile Include="Provider\GoogleCloudStorageProvider.cs" />
+    <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="ReleaseFiles\" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="ReleaseFiles\AppendPsModulePath.ps1" />
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="README.md" />
     <None Include="ReleaseFiles\BootstrapCloudToolsForPowerShell.ps1" />
-    <None Include="ReleaseFiles\GoogleCloud.psm1" />
+    <None Update="ReleaseFiles\GoogleCloud.psm1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ReleaseFiles\GoogleCloudPlatform.Format.ps1xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="ReleaseFiles\GoogleCloudPowerShell.psd1" />
-    <None Include="ReleaseFiles\GoogleCloudPlatform.Format.ps1xml" />
-    <None Include="ReleaseFiles\GoogleCloud.psd1" />
     <None Include="ReleaseFiles\PatchFromGcs.ps1" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
-  </Target>
+
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(ProjectDir)\ReleaseFiles\*" "$(TargetDir)"
+    <!-- <PostBuildEvent>copy /Y "$(ProjectDir)\ReleaseFiles\*" "$(TargetDir)"
 "$(SolutionDir)\third_party\XmlDoc2CmdletDoc\XmlDoc2CmdletDoc.exe" "$(TargetPath)"
-</PostBuildEvent>
+    </PostBuildEvent> -->
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

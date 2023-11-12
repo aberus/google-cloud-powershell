@@ -4,7 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
-#if CORECLR
+#if NETSTANDARD2_1_OR_GREATER
 using System.Runtime.InteropServices;
 #endif
 
@@ -140,7 +140,7 @@ namespace Google.PowerShell.Common
                 if (!s_isWindows.HasValue)
                 {
                     // RuntimeInformation.IsOSPlatform is only available on .NET Core.
-#if !CORECLR
+#if NET462_OR_GREATER
                     s_isWindows = true;
 #else
                     s_isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);

@@ -30,8 +30,8 @@ namespace Google.PowerShell.Tests.CloudResourceManager
                     }
                 }));
 
-            Pipeline.Commands.AddScript("Get-GcpProject | Select -First 1");
-            Collection<PSObject> results = Pipeline.Invoke();
+            PowerShellInstance.Commands.AddScript("Get-GcpProject | Select -First 1");
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             Assert.AreEqual(firstResult, results.Single().BaseObject);
         }

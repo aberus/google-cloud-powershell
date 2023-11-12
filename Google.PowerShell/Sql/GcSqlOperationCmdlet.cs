@@ -79,7 +79,7 @@ namespace Google.PowerShell.Sql
 
         private IEnumerable<Operation> GetAllOperations()
         {
-            OperationsResource.ListRequest request = Service.Operations.List(Project, Instance);
+            OperationsResource.ListRequest request = Service.Operations.List(Project);
             do
             {
                 OperationsListResponse aggList = request.Execute();

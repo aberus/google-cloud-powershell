@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 namespace Google.PowerShell.Tests.Common
 {
     /// <summary>
-    /// A set of extention methods for to help when mocking google api services.
+    /// A set of extension methods for to help when mocking Google Api services.
     /// </summary>
     public static class GoogleApiMockExtensions
     {
@@ -56,7 +56,7 @@ namespace Google.PowerShell.Tests.Common
         /// </summary>
         /// <typeparam name="TResource">The type of resource creating the request.</typeparam>
         /// <typeparam name="TRequest">The type of the request to make.</typeparam>
-        /// <typeparam name="TResponse">The type of the responce.</typeparam>
+        /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="resourceMock">The mock of the resource that makes the request.</param>
         /// <param name="requestExpression">The expression of the request. Uses Moq.It functions for wildcards.</param>
         /// <param name="exception">The exception the request will throw when executed.</param>
@@ -81,10 +81,10 @@ namespace Google.PowerShell.Tests.Common
         /// </summary>
         /// <typeparam name="TResource">The type of resource creating the request.</typeparam>
         /// <typeparam name="TRequest">The type of the request to make.</typeparam>
-        /// <typeparam name="TResponse">The type of the responce.</typeparam>
+        /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="resourceMock">The mock of the resource that makes the request.</param>
         /// <param name="requestExpression">The expression of the request. Uses Moq.It functions for wildcards.</param>
-        /// <param name="response">The responce the request should receive.</param>
+        /// <param name="response">The response the request should receive.</param>
         /// <returns>The mock of the request object. Useful for verification.</returns>
         public static Mock<TRequest> SetupRequest<TResource, TRequest, TResponse>(
             this Mock<TResource> resourceMock,
@@ -106,10 +106,10 @@ namespace Google.PowerShell.Tests.Common
         /// </summary>
         /// <typeparam name="TResource">The type of resource creating the request.</typeparam>
         /// <typeparam name="TRequest">The type of the request to make.</typeparam>
-        /// <typeparam name="TResponse">The type of the responce.</typeparam>
+        /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="resourceMock">The mock of the resource that makes the request.</param>
         /// <param name="requestExpression">The expression of the request. Uses Moq.It functions for wildcards.</param>
-        /// <param name="response">The responce the request should receive.</param>
+        /// <param name="response">The res ponce the request should receive.</param>
         /// <returns>The mock of the request object. Useful for verification.</returns>
         public static Mock<TRequest> SetupRequest<TResource, TRequest, TResponse>(
             this Mock<TResource> resourceMock,
@@ -126,10 +126,10 @@ namespace Google.PowerShell.Tests.Common
         /// </summary>
         /// <typeparam name="TResource">The type of resource creating the request.</typeparam>
         /// <typeparam name="TRequest">The type of the request to make.</typeparam>
-        /// <typeparam name="TResponse">The type of the responce.</typeparam>
+        /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="resourceMock">The mock of the resource that makes the request.</param>
         /// <param name="requestExpression">The expression of the request. Uses Moq.It functions for wildcards.</param>
-        /// <param name="response">A function returning responce the request should receive.</param>
+        /// <param name="response">A function returning response the request should receive.</param>
         /// <returns>The mock of the request object. Useful for verification.</returns>
 
         public static Mock<TRequest> SetupRequest<TResource, TRequest, TResponse>(
@@ -226,7 +226,7 @@ namespace Google.PowerShell.Tests.Common
         {
             var clientServiceMock = new Mock<IClientService>();
             var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-            // Use MockBehavior.Strict to ensure we make no acutal http requests.
+            // Use MockBehavior.Strict to ensure we make no actual HTTP requests.
             var configurableHandlerMock =
                 new Mock<ConfigurableMessageHandler>(MockBehavior.Strict, handlerMock.Object);
             var clientMock = new Mock<ConfigurableHttpClient>(MockBehavior.Strict, configurableHandlerMock.Object);

@@ -36,10 +36,10 @@ namespace Google.PowerShell.Tests.BigQuery
                     arg.Equals(queryString, StringComparison.OrdinalIgnoreCase)),
                 null,
                 It.Is<QueryOptions>(option =>
-                    option.WriteDisposition == disposition))).Returns<BigQueryJob>(null);
+                    option.WriteDisposition == disposition))).Returns<BigQueryJob>(null).Verifiable();
 
-            Pipeline.Commands.AddScript($"Start-BqJob -Query -QueryString {queryString} -WriteMode {disposition}");
-            Pipeline.Invoke();
+            PowerShellInstance.Commands.AddScript($"Start-BqJob -Query -QueryString {queryString} -WriteMode {disposition}");
+            PowerShellInstance.Invoke();
 
             ClientMock.VerifyAll();
         }

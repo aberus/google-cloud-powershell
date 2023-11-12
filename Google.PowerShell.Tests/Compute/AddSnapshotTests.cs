@@ -44,8 +44,8 @@ namespace Google.PowerShell.Tests.Compute
             ServiceMock.Resource(s => s.Snapshots).SetupRequest(
                 s => s.Get(It.IsAny<string>(), It.IsAny<string>()), snapshotResult);
 
-            Pipeline.Commands.AddScript($"Add-GceSnapShot -DiskName {diskName}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            PowerShellInstance.Commands.AddScript($"Add-GceSnapShot -DiskName {diskName}");
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             CollectionAssert.AreEqual(results, new[] { snapshotResult });
             diskResourceMock.VerifyAll();
@@ -62,8 +62,8 @@ namespace Google.PowerShell.Tests.Compute
             ServiceMock.Resource(s => s.Snapshots).SetupRequest(
                 s => s.Get(It.IsAny<string>(), It.IsAny<string>()), snapshotResult);
 
-            Pipeline.Commands.AddScript("Add-GceSnapShot -DiskName diskname -VSS");
-            Collection<PSObject> results = Pipeline.Invoke();
+            PowerShellInstance.Commands.AddScript("Add-GceSnapShot -DiskName diskname -VSS");
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             CollectionAssert.AreEqual(results, new[] { snapshotResult });
             requestMock.VerifySet(r => r.GuestFlush = true, Times.Once);
@@ -80,8 +80,8 @@ namespace Google.PowerShell.Tests.Compute
             ServiceMock.Resource(s => s.Snapshots).SetupRequest(
                 s => s.Get(It.IsAny<string>(), It.IsAny<string>()), snapshotResult);
 
-            Pipeline.Commands.AddScript("Add-GceSnapShot -DiskName diskname -Label @{'key' = 'value'}");
-            Collection<PSObject> results = Pipeline.Invoke();
+            PowerShellInstance.Commands.AddScript("Add-GceSnapShot -DiskName diskname -Label @{'key' = 'value'}");
+            Collection<PSObject> results = PowerShellInstance.Invoke();
 
             CollectionAssert.AreEqual(results, new[] { snapshotResult });
         }

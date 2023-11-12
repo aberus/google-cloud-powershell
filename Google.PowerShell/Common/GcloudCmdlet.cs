@@ -14,7 +14,10 @@ using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+
+[assembly: InternalsVisibleTo("Google.PowerShell.Tests")]
 
 namespace Google.PowerShell.Common
 {
