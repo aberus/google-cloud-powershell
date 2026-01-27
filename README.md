@@ -1,3 +1,8 @@
+> [!CAUTION]
+> Cloud Tools for PowerShell is deprecated. Effective January 14, 2026, Cloud Tools for PowerShell can no longer be installed using the Google Cloud CLI.
+>
+> For more information about the Cloud Tools for PowerShell deprecation, see [Cloud Tools for PowerShell deprecation](https://docs.cloud.google.com/tools/powershell/docs/deprecations).
+
 # Cloud Tools for PowerShell
 
 [![Build status](https://ci.appveyor.com/api/projects/status/r11ovv4348852ktt?svg=true)](https://ci.appveyor.com/project/GoogleCloudPowerShell/google-cloud-powershell)
