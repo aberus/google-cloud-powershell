@@ -4,9 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
-#if NETSTANDARD2_1_OR_GREATER
 using System.Runtime.InteropServices;
-#endif
 
 namespace Google.PowerShell.Common
 {

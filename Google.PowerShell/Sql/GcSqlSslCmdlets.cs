@@ -1,8 +1,8 @@
 ﻿// Copyright 2015-2016 Google Inc. All Rights Reserved.
 // Licensed under the Apache License Version 2.0.
 
-using Google.Apis.SQLAdmin.v1beta4;
-using Google.Apis.SQLAdmin.v1beta4.Data;
+using Google.Apis.SQLAdmin.v1;
+using Google.Apis.SQLAdmin.v1.Data;
 using System.Management.Automation;
 using Google.PowerShell.Common;
 using System.Collections.Generic;

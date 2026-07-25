@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
     <AssemblyTitle>Google.PowerShell.Tests</AssemblyTitle>
     <Product>Google.PowerShell.Tests</Product>
     <IsTestProject>true</IsTestProject>
@@ -10,23 +10,20 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Google.Apis.CloudResourceManager.v1" Version="1.63.0.3216" />
-    <PackageReference Include="Google.Apis.Compute.v1" Version="1.63.0.3218" />
-    <PackageReference Include="Google.Apis.Container.v1" Version="1.63.0.3218" />
-	<PackageReference Include="Google.Apis.SQLAdmin.v1beta4" Version="1.63.0.3223" />
-    <PackageReference Include="Google.Apis.Storage.v1" Version="1.63.0.3222" />
-    <PackageReference Include="Google.Cloud.BigQuery.V2" Version="3.4.0" />
+    <PackageReference Include="Google.Apis.CloudResourceManager.v1" Version="1.70.0.3809" />
+    <PackageReference Include="Google.Apis.Compute.v1" Version="1.71.0.3904" />
+    <PackageReference Include="Google.Apis.Container.v1" Version="1.70.0.3876" />
+	  <PackageReference Include="Google.Apis.SQLAdmin.v1beta4" Version="1.71.0.3910" />
+    <PackageReference Include="Google.Apis.Storage.v1" Version="1.70.0.3878" />
+    <PackageReference Include="Google.Cloud.BigQuery.V2" Version="3.11.0" />
     <PackageReference Include="log4net" Version="2.0.15" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.12" />
-    <PackageReference Include="Moq" Version="4.18.4" />
-	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.5.3" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="NUnit" Version="4.4.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.1.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Google.PowerShell\Google.PowerShell.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
 </Project>

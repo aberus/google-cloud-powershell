@@ -744,7 +744,7 @@ namespace Google.PowerShell.Provider
 
             Object gcsObject = Service.Objects.Get(gcsPath.Bucket, gcsPath.ObjectPath).Execute();
 
-            Stream stream = Service.HttpClient.GetStreamAsync(gcsObject.MediaLink).Result;
+            Stream stream = Service.HttpClient.GetStreamAsync(gcsObject.MediaLink).GetAwaiter().GetResult();
             IContentReader contentReader = new GcsStringReader(stream);
 
             s_telemetryReporter.ReportSuccess(
@@ -947,7 +947,7 @@ namespace Google.PowerShell.Provider
             int activityId = ActivityIdGenerator.Next();
             while (deleteTasks.Count > 0)
             {
-                Task<string> deleteTask = Task.WhenAny(deleteTasks).Result;
+                Task<string> deleteTask = Task.WhenAny(deleteTasks).GetAwaiter().GetResult();
                 deleteTasks.Remove(deleteTask);
                 WriteProgress(
                     new ProgressRecord(activityId, "Delete bucket objects", "Deleting objects")

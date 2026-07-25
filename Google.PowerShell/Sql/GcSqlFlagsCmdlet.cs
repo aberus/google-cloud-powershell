@@ -7,14 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Google.PowerShell.Common;
-using Google.Apis.SQLAdmin.v1beta4;
+using Google.Apis.SQLAdmin.v1;
 using System.Management.Automation;
 using System.Diagnostics;
 using Google;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Download;
 using Google.Apis.Services;
-using Google.Apis.SQLAdmin.v1beta4.Data;
+using Google.Apis.SQLAdmin.v1.Data;
 
 namespace Google.PowerShell.Sql
 {

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net462;netstandard2.1</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Company>Google Inc.</Company>
     <Product>PowerShell tools for the Google Cloud Platform</Product>
     <AssemblyVersion>1.0.1.10</AssemblyVersion>
@@ -27,20 +27,20 @@
     <DocumentationFile>bin\Release\Google.PowerShell.XML</DocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup><!--Condition=" '$(TargetFramework)' == 'netstandard2.0' "-->
-    <PackageReference Include="Google.Apis.Auth" Version="1.63.0" />
-    <PackageReference Include="Google.Apis.Compute.v1" Version="1.63.0.3218" />
-    <PackageReference Include="Google.Apis.Core" Version="1.63.0" />
-    <PackageReference Include="Google.Apis.Dns.v1" Version="1.63.0.3164" />
-    <PackageReference Include="Google.Apis.SQLAdmin.v1beta4" Version="1.63.0.3223" />
-    <PackageReference Include="Google.Apis.Storage.v1" Version="1.63.0.3222" />
-    <PackageReference Include="Google.Apis.CloudResourceManager.v1" Version="1.63.0.3216" />
-    <PackageReference Include="Google.Apis.Logging.v2" Version="1.63.0.3220" />
-    <PackageReference Include="Google.Apis.Pubsub.v1" Version="1.63.0.3229" />
-    <PackageReference Include="Google.Apis.Bigquery.v2" Version="1.63.0.3202" />
-    <PackageReference Include="Google.Apis.Iam.v1" Version="1.63.0.3220" />
-    <PackageReference Include="Google.Apis.Container.v1" Version="1.63.0.3218" />
-    <PackageReference Include="Google.Cloud.BigQuery.V2" Version="3.4.0" />
+  <ItemGroup>
+    <PackageReference Include="Google.Apis.Auth" Version="1.71.0" />
+    <PackageReference Include="Google.Apis.Compute.v1" Version="1.71.0.3904" />
+    <PackageReference Include="Google.Apis.Core" Version="1.71.0" />
+    <PackageReference Include="Google.Apis.Dns.v1" Version="1.70.0.3892" />
+    <PackageReference Include="Google.Apis.SQLAdmin.v1" Version="1.71.0.3910" />
+    <PackageReference Include="Google.Apis.Storage.v1" Version="1.70.0.3878" />
+    <PackageReference Include="Google.Apis.CloudResourceManager.v1" Version="1.70.0.3809" />
+    <PackageReference Include="Google.Apis.Logging.v2" Version="1.71.0.3900" />
+    <PackageReference Include="Google.Apis.Pubsub.v1" Version="1.70.0.3871" />
+    <PackageReference Include="Google.Apis.Bigquery.v2" Version="1.71.0.3907" />
+    <PackageReference Include="Google.Apis.Iam.v1" Version="1.71.0.3900" />
+    <PackageReference Include="Google.Apis.Container.v1" Version="1.70.0.3876" />
+    <PackageReference Include="Google.Cloud.BigQuery.V2" Version="3.11.0" />
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="All" />
   </ItemGroup>
 

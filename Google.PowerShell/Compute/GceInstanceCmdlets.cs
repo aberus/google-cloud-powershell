@@ -281,7 +281,7 @@ namespace Google.PowerShell.ComputeEngine
             {
                 try
                 {
-                    WriteObject(task.Result);
+                    WriteObject(task.GetAwaiter().GetResult());
                 }
                 catch (Exception e)
                 {

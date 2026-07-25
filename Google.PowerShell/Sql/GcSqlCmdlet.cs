@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Google.PowerShell.Common;
-using Google.Apis.SQLAdmin.v1beta4;
+using Google.Apis.SQLAdmin.v1;
 using System.Text.RegularExpressions;
-using Google.Apis.SQLAdmin.v1beta4.Data;
+using Google.Apis.SQLAdmin.v1.Data;
 using System.Threading;
 using System.Management.Automation;
 

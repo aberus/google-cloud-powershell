@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Google.Apis.SQLAdmin.v1beta4.Data;
-using Google.Apis.SQLAdmin.v1beta4;
+using Google.Apis.SQLAdmin.v1.Data;
+using Google.Apis.SQLAdmin.v1;
 using System.Management.Automation;
 using Google.PowerShell.Common;
 

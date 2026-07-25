@@ -158,8 +158,8 @@ namespace Google.PowerShell.ComputeEngine
             }
             try
             {
-                using (HttpResponseMessage response = Client.GetAsync($"{basePath}{Path}?{query}").Result)
-                using (Stream responseStream = response.Content?.ReadAsStreamAsync().Result)
+                using (HttpResponseMessage response = Client.GetAsync($"{basePath}{Path}?{query}").GetAwaiter().GetResult())
+                using (Stream responseStream = response.Content?.ReadAsStreamAsync().GetAwaiter().GetResult())
                 using (StreamReader streamReader = new StreamReader(responseStream ?? Stream.Null))
                 {
                     WriteObject(streamReader.ReadToEnd());

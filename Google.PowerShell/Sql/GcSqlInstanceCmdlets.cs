@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0.
 
 using Google.Apis.Services;
-using Google.Apis.SQLAdmin.v1beta4;
-using Google.Apis.SQLAdmin.v1beta4.Data;
+using Google.Apis.SQLAdmin.v1;
+using Google.Apis.SQLAdmin.v1.Data;
 using Google.Apis.Storage.v1;
 using Google.Apis.Storage.v1.Data;
 using Google.PowerShell.Common;
@@ -13,7 +13,7 @@ using System.IO;
 using System.Management.Automation;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using OperationsResource = Google.Apis.SQLAdmin.v1beta4.OperationsResource;
+using OperationsResource = Google.Apis.SQLAdmin.v1.OperationsResource;
 
 namespace Google.PowerShell.Sql
 {

@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Management.Automation;
-using Google.Apis.SQLAdmin.v1beta4.Data;
+using Google.Apis.SQLAdmin.v1.Data;
 
 namespace Google.PowerShell.Sql
 {
