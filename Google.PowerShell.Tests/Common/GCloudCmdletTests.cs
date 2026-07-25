@@ -64,6 +64,20 @@ namespace Google.PowerShell.Tests.Common
     [TestFixture]
     public class GCloudCmdletTests
     {
+        // GCloudCmdlet's constructor reads usage-reporting settings, which would otherwise invoke gcloud.
+        // Seed a fake active config so the cmdlet can be constructed without the Google Cloud SDK.
+        [SetUp]
+        public void SetUp()
+        {
+            TestSupport.SeedFakeActiveConfig();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            TestSupport.ClearActiveConfig();
+        }
+
         [Test]
         public void TestResultReportingSuccess()
         {

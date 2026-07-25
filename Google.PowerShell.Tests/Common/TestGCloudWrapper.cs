@@ -16,6 +16,7 @@ namespace Google.PowerShell.Tests.Common
         [Test]
         public void TestGetActiveConfig()
         {
+            TestSupport.RequireGcloud();
             string config = GCloudWrapper.GetActiveConfig().Result;
             Assert.IsNotNull(config);
 

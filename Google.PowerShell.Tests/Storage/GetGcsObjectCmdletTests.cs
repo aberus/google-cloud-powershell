@@ -72,7 +72,8 @@ namespace Google.PowerShell.Tests.Storage
                 o => o.Get(bucketName, objectName),
                 new GoogleApiException("service-name", "error-message") { HttpStatusCode = HttpStatusCode.NotFound });
 
-            PowerShellInstance.Commands.AddScript($"Get-GcsObject -Bucket {bucketName} -ObjectName {objectName}");
+            PowerShellInstance.Commands.AddScript(
+                $"Get-GcsObject -Bucket {bucketName} -ObjectName {objectName} -ErrorAction Continue");
             PowerShellInstance.Invoke();
 
             TestErrorRecord(ErrorCategory.ResourceUnavailable);

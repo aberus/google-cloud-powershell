@@ -116,7 +116,7 @@ namespace Google.PowerShell.Tests.Provider
                     .Throws(new Exception(mockExceptionMessage));
             PowerShellInstance.Commands.AddScript("cd gs:");
 
-            PowerShellInstance.Commands.AddScript("ls");
+            PowerShellInstance.Commands.AddScript("ls -ErrorAction SilentlyContinue");
             Collection<PSObject> output = PowerShellInstance.Invoke();
 
             Assert.AreEqual(0, output.Count);

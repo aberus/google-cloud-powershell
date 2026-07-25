@@ -101,11 +101,12 @@ namespace Google.PowerShell.Tests.Common
         /// </param>
         protected void TestErrorRecord(ErrorCategory recordCategory)
         {
-            Collection<object> errorRecords = PowerShellInstance.Runspace.CreatePipeline().Error.ReadToEnd();
-            Assert.AreEqual(errorRecords.Count, 1);
-            var errorRecord = (errorRecords[0] as PSObject)?.BaseObject as ErrorRecord;
+            // Non-terminating errors written by a cmdlet run through PowerShell.Invoke() are collected on the
+            // PowerShell instance's Error stream (not on a freshly created pipeline).
+            Assert.AreEqual(1, PowerShellInstance.Streams.Error.Count);
+            ErrorRecord errorRecord = PowerShellInstance.Streams.Error[0];
             Assert.IsNotNull(errorRecord);
-            Assert.AreEqual(errorRecord.CategoryInfo.Category, recordCategory);
+            Assert.AreEqual(recordCategory, errorRecord.CategoryInfo.Category);
         }
     }
 }

@@ -14,6 +14,15 @@ namespace Google.PowerShell.Tests.Common
     {
         private CancellationToken _cancelToken = new CancellationToken();
 
+        // Every test here obtains a real token through gcloud, so start from a clean cache and skip when the
+        // Google Cloud SDK is not available.
+        [SetUp]
+        public void SetUp()
+        {
+            TestSupport.ClearActiveConfig();
+            TestSupport.RequireGcloud();
+        }
+
         /// <summary>
         /// This test checks that a call to RefreshTokenAsync will give us a new token.
         /// </summary>

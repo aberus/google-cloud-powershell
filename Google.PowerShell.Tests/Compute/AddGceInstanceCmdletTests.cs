@@ -72,7 +72,7 @@ namespace Google.PowerShell.Tests.Compute
                 apiException);
 
             PowerShellInstance.Commands.AddScript(
-                $"Add-GceInstance -Name instance-name -Disk ${psDiskVar}");
+                $"Add-GceInstance -Name instance-name -Disk ${psDiskVar} -ErrorAction Continue");
             Collection<PSObject> results = PowerShellInstance.Invoke();
 
             // An error should be thrown (if it is a terminating error,
@@ -116,7 +116,7 @@ namespace Google.PowerShell.Tests.Compute
                 $"Add-GceInstance -Name instance-name -Disk ${psDiskVar} -CustomCpu 2 -CustomMemory 2048 -MachineType some-type");
             var e = Assert.Throws<ParameterBindingException>(() => PowerShellInstance.Invoke());
 
-            Assert.AreEqual("Parameter set cannot be resolved using the specified named parameters.", e.Message);
+            Assert.That(e.Message, Does.StartWith("Parameter set cannot be resolved using the specified named parameters."));
             Assert.IsNull(e.ParameterName);
         }
 

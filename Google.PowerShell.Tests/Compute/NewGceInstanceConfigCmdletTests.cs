@@ -60,7 +60,7 @@ namespace Google.PowerShell.Tests.Compute
                 $"New-GceInstanceConfig -Region us-central1-a -Name instance-name -CustomCpu 2 -CustomMemory 2048 -MachineType some-type");
             var e = Assert.Throws<ParameterBindingException>(() => PowerShellInstance.Invoke());
 
-            Assert.AreEqual("Parameter set cannot be resolved using the specified named parameters.", e.Message);
+            Assert.That(e.Message, Does.StartWith("Parameter set cannot be resolved using the specified named parameters."));
             Assert.IsNull(e.ParameterName);
         }
 

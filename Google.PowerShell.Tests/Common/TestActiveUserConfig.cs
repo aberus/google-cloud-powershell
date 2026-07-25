@@ -1,4 +1,4 @@
-﻿// Copyright 2015-2016 Google Inc. All Rights Reserved.
+// Copyright 2015-2016 Google Inc. All Rights Reserved.
 // Licensed under the Apache License Version 2.0.
 
 using Google.PowerShell.Common;
@@ -34,6 +34,14 @@ namespace Google.PowerShell.Tests.Common
                 'config_sentinel': 'sentinel.sentinel'
             }
         }".Replace('\'', '\"');
+
+        // Start each test from a clean cache so the gcloud-backed tests are not satisfied by a config that
+        // another fixture may have seeded.
+        [SetUp]
+        public void SetUp()
+        {
+            TestSupport.ClearActiveConfig();
+        }
 
         /// <summary>
         /// Tests that active user config returns correct access token and sentinel file.
@@ -85,6 +93,7 @@ namespace Google.PowerShell.Tests.Common
         [Test]
         public void TestGetActiveUserConfig()
         {
+            TestSupport.RequireGcloud();
             ActiveUserConfig userConfig = ActiveUserConfig.GetActiveUserConfig().Result;
 
             Assert.IsNotNull(userConfig, "GetActiveUserConfig should not return null.");
@@ -101,6 +110,7 @@ namespace Google.PowerShell.Tests.Common
         [Test]
         public void TestGetActiveUserConfigCache()
         {
+            TestSupport.RequireGcloud();
             ActiveUserConfig userConfig = ActiveUserConfig.GetActiveUserConfig().Result;
             ActiveUserConfig userConfig2 = ActiveUserConfig.GetActiveUserConfig().Result;
             Assert.AreEqual(userConfig, userConfig2, "GetActiveUserConfig should cache the result.");
@@ -116,6 +126,7 @@ namespace Google.PowerShell.Tests.Common
         [Test]
         public void TestGetActiveUserConfigRefresh()
         {
+            TestSupport.RequireGcloud();
             ActiveUserConfig userConfig = ActiveUserConfig.GetActiveUserConfig().Result;
             ActiveUserConfig userConfig2 = ActiveUserConfig.GetActiveUserConfig(refreshConfig: true).Result;
             Assert.AreNotEqual(userConfig, userConfig2, "GetActiveUserConfig should not cache the result if refreshConfig is true.");
@@ -127,6 +138,7 @@ namespace Google.PowerShell.Tests.Common
         [Test]
         public void TestGetActiveUserToken()
         {
+            TestSupport.RequireGcloud();
             CancellationToken cancellationToken = new CancellationToken();
             TokenResponse activeToken = ActiveUserConfig.GetActiveUserToken(cancellationToken).Result;
 
@@ -141,6 +153,7 @@ namespace Google.PowerShell.Tests.Common
         [Test]
         public void TestGetActiveUserTokenCache()
         {
+            TestSupport.RequireGcloud();
             CancellationToken cancellationToken = new CancellationToken();
             TokenResponse activeToken = ActiveUserConfig.GetActiveUserToken(cancellationToken).Result;
             TokenResponse activeToken2 = ActiveUserConfig.GetActiveUserToken(cancellationToken).Result;
@@ -153,6 +166,7 @@ namespace Google.PowerShell.Tests.Common
         [Test]
         public void TestGetActiveUserTokenRefresh()
         {
+            TestSupport.RequireGcloud();
             CancellationToken cancellationToken = new CancellationToken();
             TokenResponse activeToken = ActiveUserConfig.GetActiveUserToken(cancellationToken).Result;
             TokenResponse activeToken2 = ActiveUserConfig.GetActiveUserToken(cancellationToken, refresh: true).Result;

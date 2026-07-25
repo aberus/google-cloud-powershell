@@ -24,6 +24,15 @@ namespace Google.PowerShell.Tests.Compute
 {
     public class GetGceMetadataTest : GceCmdletTestBase
     {
+        // The cmdlet's HttpClient is static, so its default headers persist across tests. Reset the metadata
+        // header before each test so the "header is added exactly once" assertions are deterministic regardless
+        // of test order.
+        [SetUp]
+        public void ResetMetadataClientHeaders()
+        {
+            GetGceMetadataCmdlet.Client.DefaultRequestHeaders.Remove(GetGceMetadataCmdlet.MetadataFlavorHeader);
+        }
+
         /// <summary>
         /// Tests that the HttpClient used by GceMetadata
         /// has the correct headers for the first call.

@@ -10,6 +10,19 @@ namespace Google.PowerShell.Tests.Common
     [TestFixture]
     public class ConfigDefaultAttributeTest
     {
+        // Seed a fake active config so the default project resolves without invoking gcloud.
+        [SetUp]
+        public void SetUp()
+        {
+            TestSupport.SeedFakeActiveConfig();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            TestSupport.ClearActiveConfig();
+        }
+
         internal class TestGCloudCmdlet : GCloudCmdlet
         {
             [ConfigPropertyName("project")]
@@ -49,4 +62,4 @@ namespace Google.PowerShell.Tests.Common
             Assert.Throws<PSInvalidOperationException>(cmdlet.TestBeginProcessing);
         }
     }
-}
+}
