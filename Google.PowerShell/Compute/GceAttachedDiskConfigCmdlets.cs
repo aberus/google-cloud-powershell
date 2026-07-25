@@ -5,7 +5,7 @@ using Google.Apis.Compute.v1.Data;
 using Google.PowerShell.Common;
 using System.Management.Automation;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     ///   <para type="synopsis">

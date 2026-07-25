@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <para type="synopsis">
     /// Gets Google Compute Engine target proxies.

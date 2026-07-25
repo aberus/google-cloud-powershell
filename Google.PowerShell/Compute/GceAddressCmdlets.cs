@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// <para type="synopsis">

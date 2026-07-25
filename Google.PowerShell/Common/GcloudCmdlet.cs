@@ -34,7 +34,7 @@ namespace Google.PowerShell.Common
         // Resource Service used for getting project number.
         protected CloudResourceManagerService ResourceService => _resourceService.Value;
 
-        private Lazy<CloudResourceManagerService> _resourceService =
+        private readonly Lazy<CloudResourceManagerService> _resourceService =
             new Lazy<CloudResourceManagerService>(() => new CloudResourceManagerService(GetBaseClientServiceInitializer()));
 
         /// <summary>
@@ -85,8 +85,7 @@ namespace Google.PowerShell.Common
             // Try to resolve the path using PowerShell.
             try
             {
-                ProviderInfo provider = null;
-                string[] result = GetResolvedProviderPathFromPSPath(path, out provider).ToArray();
+                string[] result = GetResolvedProviderPathFromPSPath(path, out ProviderInfo provider).ToArray();
 
                 // Only return the resolved path if there are no ambiguities.
                 // If path contains wildcards, then it may resolved to more than 1 path.
@@ -104,7 +103,7 @@ namespace Google.PowerShell.Common
                 ProviderInfo provider = null;
                 PSDriveInfo psDrive = null;
                 string unresolvedPath = SessionState.Path?.GetUnresolvedProviderPathFromPSPath(
-                    itemEx.ItemName, out provider, out psDrive);
+                    itemEx.ItemName, out provider, out _);
                 return new Tuple<string, ProviderInfo>(unresolvedPath, provider);
             }
 
@@ -129,8 +128,7 @@ namespace Google.PowerShell.Common
                 return filePath;
             }
 
-            Tuple<string, ProviderInfo> pathAndProviderInfo = null;
-
+            Tuple<string, ProviderInfo> pathAndProviderInfo;
             try
             {
                 pathAndProviderInfo = GetFullPath(filePath);
@@ -334,9 +332,9 @@ namespace Google.PowerShell.Common
         }
 
         /// <summary>
-        /// Returns a project number based on a project ID.
+        /// Returns a project number.
         /// </summary>
-        protected string GetProjectNumber(string projectId)
+        protected string GetProjectNumber()
         {
             ProjectsResource.GetRequest getRequest = ResourceService.Projects.Get(Project);
             Project project = getRequest.Execute();
@@ -365,7 +363,7 @@ namespace Google.PowerShell.Common
                     Project = CloudSdkSettings.GetDefaultProject();
                 }
 
-                projectNumber = GetProjectNumber(Project);
+                projectNumber = GetProjectNumber();
             }
             catch { }
 
@@ -448,10 +446,11 @@ namespace Google.PowerShell.Common
             {
                 for (int i = 0; i < parameterSetNames.Length; i += 1)
                 {
-                    ParameterAttribute paramAttribute = new ParameterAttribute()
+                    ParameterAttribute paramAttribute = new ParameterAttribute
                     {
                         Mandatory = isMandatory,
-                        HelpMessage = helpMessage
+                        HelpMessage = helpMessage,
+                        ParameterSetName = parameterSetNames[i]
                     };
                     paramAttribute.ParameterSetName = parameterSetNames[i];
                     attributeLists.Add(paramAttribute);
@@ -460,8 +459,10 @@ namespace Google.PowerShell.Common
 
             if (validSet?.Length != 0)
             {
-                var validateSetAttribute = new ValidateSetAttribute(validSet);
-                validateSetAttribute.IgnoreCase = true;
+                var validateSetAttribute = new ValidateSetAttribute(validSet)
+                {
+                    IgnoreCase = true
+                };
                 attributeLists.Add(validateSetAttribute);
             }
 

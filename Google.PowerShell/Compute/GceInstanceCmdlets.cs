@@ -12,7 +12,7 @@ using System.Management.Automation;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// <para type="synopsis">

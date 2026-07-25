@@ -6,7 +6,7 @@ using Google.PowerShell.Common;
 using System.Collections;
 using System.Management.Automation;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// <para type="synopsis">

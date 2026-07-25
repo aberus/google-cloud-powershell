@@ -6,7 +6,7 @@ using Google.PowerShell.Common;
 using System.Collections.Generic;
 using System.Management.Automation;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// <para type="synopsis">
@@ -227,7 +227,7 @@ namespace Google.PowerShell.ComputeEngine
         {
             if (Email == null)
             {
-                string projectNumber = GetProjectNumber(Project);
+                string projectNumber = GetProjectNumber();
                 Email = $"{projectNumber}-compute@developer.gserviceaccount.com";
             }
             switch (ParameterSetName)

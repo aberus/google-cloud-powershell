@@ -14,7 +14,7 @@
 
 using Google.Apis.Compute.v1;
 using Google.Apis.Compute.v1.Data;
-using Google.PowerShell.ComputeEngine;
+using Google.PowerShell.Compute;
 using Google.PowerShell.Tests.Common;
 using Moq;
 using NUnit.Framework;

@@ -10,7 +10,7 @@ using System.Linq;
 using System.Management.Automation;
 using System.Collections;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// <para type="synopsis">

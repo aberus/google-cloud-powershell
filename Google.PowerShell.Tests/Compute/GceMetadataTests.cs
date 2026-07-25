@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Management.Automation;
-using Google.PowerShell.ComputeEngine;
+using Google.PowerShell.Compute;
 
 namespace Google.PowerShell.Tests.Compute
 {

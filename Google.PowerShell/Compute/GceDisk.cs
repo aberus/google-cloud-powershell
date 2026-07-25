@@ -9,7 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// <para type="synopsis">
@@ -394,7 +394,7 @@ namespace Google.PowerShell.ComputeEngine
             // In PowerShell, 10GB is parsed as 10*2^30. If a user enters 10GB, bring it back down to 10.
             if (NewSizeGb > 1L << 30)
             {
-                NewSizeGb = NewSizeGb / (1L << 30);
+                NewSizeGb /= (1L << 30);
             }
 
             var diskResizeReq = new DisksResizeRequest { SizeGb = NewSizeGb };

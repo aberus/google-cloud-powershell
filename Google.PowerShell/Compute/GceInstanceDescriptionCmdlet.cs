@@ -2,12 +2,11 @@
 // Licensed under the Apache License Version 2.0.
 
 using Google.Apis.Compute.v1.Data;
-using Google.PowerShell.Common;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// This abstract class describes all of the information needed to create an instance template description.

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Management.Automation;
 using static Google.Apis.Compute.v1.FirewallsResource;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// <para type="synopsis">

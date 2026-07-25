@@ -108,9 +108,12 @@ namespace Google.PowerShell.PubSub
         protected override void ProcessRecord()
         {
             Name = GetProjectPrefixForSubscription(Name, Project);
-            PullRequest requestBody = new PullRequest();
-            requestBody.ReturnImmediately = ReturnImmediately.IsPresent;
-            requestBody.MaxMessages = MaxMessages.HasValue ? MaxMessages : DefaultMaxMessages;
+            PullRequest requestBody = new PullRequest
+            {
+                ReturnImmediately = ReturnImmediately.IsPresent,
+                MaxMessages = MaxMessages.HasValue ? MaxMessages : DefaultMaxMessages
+            };
+
             if (requestBody.MaxMessages <= 0)
             {
                 throw new PSArgumentException("MaxMessages parameter should have a value greater than 0.");

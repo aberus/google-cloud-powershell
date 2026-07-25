@@ -5,7 +5,7 @@ using Google.Apis.Compute.v1.Data;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// Library class for transforming IDictionary objects into Compute Engine Metadata objects.

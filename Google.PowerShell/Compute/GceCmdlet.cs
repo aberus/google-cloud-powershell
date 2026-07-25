@@ -21,7 +21,7 @@ using System.Linq;
 using System.Management.Automation;
 using System.Threading;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// Base class for Google Compute Engine-based cmdlets. 

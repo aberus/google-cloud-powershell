@@ -31,7 +31,7 @@ namespace Google.PowerShell.CloudStorage
 
         protected static readonly string ContentLanguageKeyMetadata = "Content-Language";
 
-        private static string[] FixedKeysMetadata = new string[] {
+        private static readonly string[] FixedKeysMetadata = new string[] {
             ContentTypeKeyMetadata, ContentEncodingKeyMetadata, CacheControlKeyMetadata,
             ContentDispositionKeyMetadata, ContentLanguageKeyMetadata
         };
@@ -1135,8 +1135,8 @@ namespace Google.PowerShell.CloudStorage
         {
             if (downloadProgress.Status == DownloadStatus.Failed || downloadProgress.Exception != null)
             {
-                GoogleApiException googleApiException = downloadProgress.Exception as GoogleApiException;
-                if (googleApiException != null && googleApiException.HttpStatusCode == HttpStatusCode.NotFound)
+                if (downloadProgress.Exception is GoogleApiException googleApiException &&
+                    googleApiException.HttpStatusCode == HttpStatusCode.NotFound)
                 {
                     ErrorRecord errorRecord = new ErrorRecord(
                         new ItemNotFoundException($"Storage object '{ObjectName}' does not exist."),

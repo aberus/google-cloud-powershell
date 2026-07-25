@@ -5,7 +5,7 @@ using Google.Apis.Compute.v1.Data;
 using System;
 using System.Linq;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// Container exception for Operation.ErrorData.

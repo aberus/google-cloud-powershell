@@ -10,7 +10,7 @@ using System.Management.Automation;
 using System.Net;
 using System.Net.Http;
 
-namespace Google.PowerShell.ComputeEngine
+namespace Google.PowerShell.Compute
 {
     /// <summary>
     /// <para type="synopsis">

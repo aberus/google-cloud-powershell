@@ -4,7 +4,7 @@
 using Google.Apis.Compute.v1;
 using Google.Apis.Compute.v1.Data;
 using Google.PowerShell.Common;
-using Google.PowerShell.ComputeEngine;
+using Google.PowerShell.Compute;
 using System;
 using System.Collections;
 using System.Collections.Generic;

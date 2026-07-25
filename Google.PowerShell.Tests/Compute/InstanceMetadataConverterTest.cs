@@ -2,7 +2,7 @@
 // Licensed under the Apache License Version 2.0.
 
 using Google.Apis.Compute.v1.Data;
-using Google.PowerShell.ComputeEngine;
+using Google.PowerShell.Compute;
 using NUnit.Framework;
 using System.Collections;
 using System.Linq;
