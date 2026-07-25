@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -17,10 +17,10 @@ Describe "Get-GceUrlMap" {
         { Get-GceUrlMap $urlMapName1 } | Should Throw 404
     }
 
-    gcloud compute http-health-checks create "health-check-$r" 2>$null
-    gcloud compute backend-services create "backend-$r" --http-health-checks "health-check-$r" --global 2>$null
-    gcloud compute url-maps create $urlMapName1 --default-service "backend-$r" 2>$null
-    gcloud compute url-maps create $urlMapName2 --default-service "backend-$r" 2>$null
+    Add-GceHealthCheck "health-check-$r" | Out-Null
+    Add-GceBackendService "backend-$r" -HttpHealthCheck "health-check-$r" | Out-Null
+    Add-GceUrlMap $urlMapName1 -DefaultService "backend-$r" | Out-Null
+    Add-GceUrlMap $urlMapName2 -DefaultService "backend-$r" | Out-Null
 
     It "should get all maps" {
         $maps = Get-GceUrlMap
@@ -34,10 +34,10 @@ Describe "Get-GceUrlMap" {
         ($map | Get-Member).TypeName | ForEach-Object { $_ | Should Be Google.Apis.Compute.v1.Data.UrlMap }
     }
     
-    gcloud compute url-maps delete $urlMapName1 -q 2>$null
-    gcloud compute url-maps delete $urlMapName2 -q 2>$null
-    gcloud compute backend-services delete "backend-$r" --global -q 2>$null
-    gcloud compute http-health-checks delete "health-check-$r" -q 2>$null
+    Remove-GceUrlMap $urlMapName1 -ErrorAction SilentlyContinue
+    Remove-GceUrlMap $urlMapName2 -ErrorAction SilentlyContinue
+    Remove-GceBackendService "backend-$r" -ErrorAction SilentlyContinue
+    Remove-GceHealthCheck "health-check-$r" -Http -ErrorAction SilentlyContinue
 }
 
 Reset-GCloudConfig $oldActiveConfig $configName

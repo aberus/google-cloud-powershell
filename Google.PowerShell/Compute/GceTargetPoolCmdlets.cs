@@ -317,4 +317,167 @@ namespace Google.PowerShell.Compute
                 () => WriteObject(Service.TargetPools.Get(project, region, name).Execute()));
         }
     }
+
+    /// <summary>
+    /// <para type="synopsis">
+    /// Adds a new Google Compute Engine target pool.
+    /// </para>
+    /// <para type="description">
+    /// Creates a new regional target pool. Target pools are used by network (regional) forwarding rules to
+    /// distribute traffic across a group of instances.
+    /// </para>
+    /// <example>
+    ///   <code>PS C:\> Add-GceTargetPool "my-pool" -Region us-central1</code>
+    ///   <para>Creates a target pool named "my-pool" in region "us-central1".</para>
+    /// </example>
+    /// </summary>
+    [Cmdlet(VerbsCommon.Add, "GceTargetPool", DefaultParameterSetName = ParameterSetNames.ByValues)]
+    [OutputType(typeof(TargetPool))]
+    public class AddGceTargetPoolCmdlet : GceConcurrentCmdlet
+    {
+        private class ParameterSetNames
+        {
+            public const string ByValues = "ByValues";
+            public const string ByObject = "ByObject";
+        }
+
+        /// <summary>
+        /// <para type="description">
+        /// The project that will own the target pool. Defaults to the project in the Cloud SDK config.
+        /// </para>
+        /// </summary>
+        [Parameter]
+        [ConfigPropertyName(CloudSdkSettings.CommonProperties.Project)]
+        public override string Project { get; set; }
+
+        /// <summary>
+        /// <para type="description">
+        /// The region the target pool will be in. Defaults to the region in the Cloud SDK config.
+        /// </para>
+        /// </summary>
+        [Parameter]
+        [ConfigPropertyName(CloudSdkSettings.CommonProperties.Region)]
+        public string Region { get; set; }
+
+        /// <summary>
+        /// <para type="description">The name of the target pool to create.</para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByValues, Mandatory = true, Position = 0)]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// <para type="description">Human readable description of the target pool.</para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByValues)]
+        public string Description { get; set; }
+
+        /// <summary>
+        /// <para type="description">A TargetPool object describing the target pool to create.</para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByObject, Mandatory = true,
+            Position = 0, ValueFromPipeline = true)]
+        public TargetPool Object { get; set; }
+
+        protected override void ProcessRecord()
+        {
+            TargetPool body;
+            if (ParameterSetName == ParameterSetNames.ByObject)
+            {
+                body = Object;
+            }
+            else
+            {
+                body = new TargetPool
+                {
+                    Name = Name,
+                    Description = Description
+                };
+            }
+
+            string name = body.Name;
+            Operation operation = Service.TargetPools.Insert(body, Project, Region).Execute();
+            AddRegionOperation(Project, Region, operation,
+                () => WriteObject(Service.TargetPools.Get(Project, Region, name).Execute()));
+        }
+    }
+
+    /// <summary>
+    /// <para type="synopsis">
+    /// Removes a Google Compute Engine target pool.
+    /// </para>
+    /// <para type="description">
+    /// Deletes the named regional target pool.
+    /// </para>
+    /// <example>
+    ///   <code>PS C:\> Remove-GceTargetPool "my-pool" -Region us-central1</code>
+    ///   <para>Removes the target pool named "my-pool" in region "us-central1".</para>
+    /// </example>
+    /// </summary>
+    [Cmdlet(VerbsCommon.Remove, "GceTargetPool", SupportsShouldProcess = true,
+        DefaultParameterSetName = ParameterSetNames.ByName)]
+    public class RemoveGceTargetPoolCmdlet : GceConcurrentCmdlet
+    {
+        private class ParameterSetNames
+        {
+            public const string ByName = "ByName";
+            public const string ByObject = "ByObject";
+        }
+
+        /// <summary>
+        /// <para type="description">
+        /// The project that owns the target pool. Defaults to the project in the Cloud SDK config.
+        /// </para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByName)]
+        [ConfigPropertyName(CloudSdkSettings.CommonProperties.Project)]
+        public override string Project { get; set; }
+
+        /// <summary>
+        /// <para type="description">
+        /// The region of the target pool. Defaults to the region in the Cloud SDK config.
+        /// </para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByName)]
+        [ConfigPropertyName(CloudSdkSettings.CommonProperties.Region)]
+        public string Region { get; set; }
+
+        /// <summary>
+        /// <para type="description">The name of the target pool to remove.</para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByName, Mandatory = true,
+            Position = 0, ValueFromPipeline = true)]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// <para type="description">The TargetPool object to remove.</para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByObject, Mandatory = true,
+            Position = 0, ValueFromPipeline = true)]
+        public TargetPool Object { get; set; }
+
+        protected override void ProcessRecord()
+        {
+            string project;
+            string region;
+            string name;
+            if (ParameterSetName == ParameterSetNames.ByObject)
+            {
+                project = GetProjectNameFromUri(Object.SelfLink);
+                region = GetRegionNameFromUri(Object.Region);
+                name = Object.Name;
+            }
+            else
+            {
+                project = Project;
+                region = Region;
+                name = Name;
+            }
+
+            if (ShouldProcess($"{project}/{region}/{name}", "Remove-GceTargetPool"))
+            {
+                Operation operation = Service.TargetPools.Delete(project, region, name).Execute();
+                AddRegionOperation(project, region, operation);
+            }
+        }
+    }
 }

@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -12,7 +12,7 @@ Get-GceInstanceTemplate | Remove-GceInstanceTemplate
 Add-GceInstanceTemplate -Name $templateName -MachineType $machineType -BootDiskImage $image
 $template = Get-GceInstanceTemplate $templateName
 
-gcloud compute target-pools create test-pool --region us-central1 2>$null
+Add-GceTargetPool test-pool -Region us-central1 | Out-Null
 $poolUrl = (Get-GceTargetPool -Name test-pool).SelfLink
 
 Describe "Get-GceManagedInstanceGroup" {
@@ -256,7 +256,7 @@ Describe "Wait-GceManagedInstanceGroup" {
     Remove-GceManagedInstanceGroup $groupName1
 }
 
-gcloud compute target-pools delete test-pool --region us-central1 -q 2>$null
+Remove-GceTargetPool test-pool -Region us-central1 -ErrorAction SilentlyContinue
 Get-GceInstanceTemplate | Remove-GceInstanceTemplate
 
 Reset-GCloudConfig $oldActiveConfig $configName

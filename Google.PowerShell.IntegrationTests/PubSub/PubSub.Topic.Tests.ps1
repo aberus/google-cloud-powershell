@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GCloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -8,13 +8,13 @@ Describe "Get-GcpsTopic" {
     $script:topicName = "gcps-testing-topic-$r"
     $script:secondTopicName = "gcps-testing-topic2-$r"
     $previousCount = (Get-GcpsTopic).Count
-    gcloud beta pubsub topics create $script:topicName 2>$null
-    gcloud beta pubsub topics create $script:secondTopicName 2>$null
+    New-GcpsTopic -Topic $script:topicName | Out-Null
+    New-GcpsTopic -Topic $script:secondTopicName | Out-Null
     Start-Sleep -Seconds 5
 
     AfterAll {
-        gcloud beta pubsub topics delete $topicName --quiet 2>$null
-        gcloud beta pubsub topics delete $secondTopicName --quiet 2>$null
+        Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+        Remove-GcpsTopic -Topic $secondTopicName -ErrorAction SilentlyContinue
     }
 
     It "should work without any parameters" {
@@ -61,9 +61,9 @@ Describe "New-GcpsTopic" {
             $topics.Name -contains "projects/$project/topics/$thirdTopicName" | Should Be $true
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub topics delete $secondTopicName --quiet 2>$null
-            gcloud beta pubsub topics delete $thirdTopicName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsTopic -Topic $secondTopicName -ErrorAction SilentlyContinue
+            Remove-GcpsTopic -Topic $thirdTopicName -ErrorAction SilentlyContinue
         }
     }
 
@@ -77,7 +77,7 @@ Describe "New-GcpsTopic" {
             { New-GcpsTopic -Topic $topicName -ErrorAction Stop } | Should Throw "already exists" 
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
         }
     }
 

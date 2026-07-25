@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 $project, $_, $oldActiveConfig, $configName = Set-GCloudConfig
 

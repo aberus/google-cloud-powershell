@@ -1,4 +1,3 @@
-﻿#TODO(quoct): Replace gcloud command with PowerShell cmdlet once they are available.
 . $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
@@ -24,20 +23,24 @@ Describe "Get-GkeCluster" {
     # Create Cluster in Parallel to save time.
     $clusterCreationScriptBlock =
     {
-        param($clusterName, $clusterZone, $clusterAdditionalZone)
+        param($cmdletPath, $clusterName, $clusterZone, $clusterAdditionalZone)
+        . $cmdletPath
+        Install-GCloudCmdlets | Out-Null
         if ($null -eq $clusterZone -and $null -eq $clusterAdditionalZone) {
-            gcloud container clusters create $clusterName --num-nodes=1 2>$null
+            Add-GkeCluster -ClusterName $clusterName -InitialNodeCount 1
         }
         else {
-            gcloud container clusters create $clusterName --zone $clusterZone `
-                    --additional-zones $clusterAdditionalZone --num-nodes=1 2>$null
+            Add-GkeCluster -ClusterName $clusterName -Zone $clusterZone `
+                    -AdditionalZone $clusterAdditionalZone -InitialNodeCount 1
         }
     }
 
-    $jobOne = Start-Job -ScriptBlock $clusterCreationScriptBlock -ArgumentList $clusterOneName
-    $jobTwo = Start-Job -ScriptBlock $clusterCreationScriptBlock -ArgumentList $clusterTwoName
+    $jobOne = Start-Job -ScriptBlock $clusterCreationScriptBlock `
+                        -ArgumentList @($gcloudCmdletsPath, $clusterOneName)
+    $jobTwo = Start-Job -ScriptBlock $clusterCreationScriptBlock `
+                        -ArgumentList @($gcloudCmdletsPath, $clusterTwoName)
     $jobThree = Start-Job -ScriptBlock $clusterCreationScriptBlock `
-                          -ArgumentList @($clusterThreeName, $zone, $additionalZone)
+                          -ArgumentList @($gcloudCmdletsPath, $clusterThreeName, $zone, $additionalZone)
 
     Wait-Job $jobOne, $jobTwo, $jobThree | Remove-Job
 
@@ -197,7 +200,7 @@ Describe "New-GkeNodeConfig" {
 # Given a network name, create a network name and extract
 # out a subnetwork that corresponds to region $region.
 function New-NetworkAndSubnetwork($networkName, $region) {
-    gcloud compute networks create $networkName 2>$null | Out-Null
+    New-GceNetwork -Name $networkName | Out-Null
     $network = Get-GceNetwork $networkName
     $subnet = $network.Subnetworks | Where-Object {$_.Contains($region)}
     $subnet -match "subnetworks/([^/]*)" | Out-Null

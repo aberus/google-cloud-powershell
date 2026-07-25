@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -28,7 +28,7 @@ Describe "Get-GcsBucket" {
     }
 
     It "should work" {
-        gsutil mb -p gcloud-powershell-testing gs://gcps-testbucket 2>$null
+        New-GcsBucket -Name gcps-testbucket -Project gcloud-powershell-testing | Out-Null
         $bucket = Get-GcsBucket -Name "gcps-testbucket"
         $bucket.GetType().FullName | Should Match "Google.Apis.Storage.v1.Data.Bucket"
 
@@ -36,7 +36,7 @@ Describe "Get-GcsBucket" {
         $bucket.Id | Should Match "gcps-testbucket"
         $bucket.SelfLink | Should Match "https://www.googleapis.com/storage/v1/b/gcps-testbucket"
 
-        gsutil rb gs://gcps-testbucket 2>$null
+        Remove-GcsBucket -Name gcps-testbucket -ErrorAction SilentlyContinue
     }
 
     It "should take into account changes in the Cloud SDK, including environment variables" -Skip:$skipServiceAccountTest {
@@ -94,12 +94,11 @@ Describe "New-GcsBucket" {
 
     # Should remove the bucket before/after each test to ensure we are in a good state.
     BeforeEach {
-        gsutil -m rm -r "gs://gcps-bucket-creation/*" 2>$null
-        gsutil rb gs://gcps-bucket-creation 2>$null
+        Remove-GcsBucket -Name gcps-bucket-creation -Force -ErrorAction SilentlyContinue
     }
 
     AfterEach {
-        gsutil rb gs://gcps-bucket-creation 2>$null
+        Remove-GcsBucket -Name gcps-bucket-creation -ErrorAction SilentlyContinue
     }
 
     It "should work" {
@@ -166,8 +165,8 @@ Describe "New-GcsBucket" {
         # General requests to the object should fail.
         { Invoke-WebRequest https://www.googleapis.com/storage/v1/b/gcps-bucket-creation/o/test-obj } |
             Should Throw "(401) Unauthorized"
-        # But going through gsutil (which passes along your Google credentials) will work.
-        gsutil cat gs://gcps-bucket-creation/test-obj | Should Be "testing 1, 2, 3..."
+        # But going through Read-GcsObject (which passes along your Google credentials) will work.
+        Read-GcsObject -Bucket "gcps-bucket-creation" -ObjectName "test-obj" | Should Be "testing 1, 2, 3..."
     }
 }
 

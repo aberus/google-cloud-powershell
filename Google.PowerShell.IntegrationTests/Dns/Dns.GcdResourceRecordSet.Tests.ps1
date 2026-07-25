@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\Dns\GcdCmdlets.ps1
+. $PSScriptRoot\..\Dns\GcdCmdlets.ps1
 Install-GcloudCmdlets
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
 
@@ -24,7 +24,7 @@ Describe "Get-GcdResourceRecordSet" {
     }
 
     # Create zone for testing 
-    gcloud dns managed-zones create --dns-name=$dnsName1 --description=$testDescrip1 $testZone1 --project=$project 2>$null
+    Add-GcdManagedZone -Name $testZone1 -DnsName $dnsName1 -Description $testDescrip1 -Project $project | Out-Null
 
     # Add a new A-type record and a new AAAA type record to the test zone
     Add-GcdChange -Project $project -Zone $testZone1 -Add $testRrsetA,$testRrsetAAAA

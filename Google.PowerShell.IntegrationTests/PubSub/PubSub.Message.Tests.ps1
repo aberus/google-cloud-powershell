@@ -1,27 +1,26 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GCloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
 
-# Returns all available messages from the subscription (auto-acknowledge all of them in the process).
+# Returns all available messages from the subscription (auto-acknowledging all of them in the process).
 function Get-SubscriptionMessage($subscription)
 {
-    while ($true) {
-        $messageString = [string](gcloud beta pubsub subscriptions pull $subscription --format=json --auto-ack 2>$null)
-        $messageObject = ConvertFrom-Json $messageString
-        # Output the messages to the pipeline if we get any, else we are done.
-        if ($messageObject.Count -ne 0) {
-            $messageObject
+    # A single pull is not guaranteed to return every available message, and messages can take a moment to
+    # become available after publishing, so keep pulling until several consecutive pulls return nothing.
+    # -ReturnImmediately stops the final, empty pulls from blocking.
+    $consecutiveEmptyPulls = 0
+    while ($consecutiveEmptyPulls -lt 3) {
+        $messages = @(Get-GcpsMessage -Subscription $subscription -AutoAck -ReturnImmediately)
+        if ($messages.Count -eq 0) {
+            $consecutiveEmptyPulls += 1
+            Start-Sleep -Seconds 1
         }
         else {
-            return
+            $consecutiveEmptyPulls = 0
+            $messages
         }
     }
-}
-
-function ConvertFrom-Base64String($base64String)
-{
-    return [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($base64String))
 }
 
 Describe "New-GcpsMessage" {
@@ -68,8 +67,8 @@ Describe "Publish-GcpsMessage" {
 
             $subscriptionMessage = Get-SubscriptionMessage -Subscription $subscriptionName
 
-            $subscriptionMessage.Message.MessageId | Should BeExactly $publishedMessage.MessageId
-            (ConvertFrom-Base64String $subscriptionMessage.Message.Data) | Should BeExactly $testData
+            $subscriptionMessage.MessageId | Should BeExactly $publishedMessage.MessageId
+            $subscriptionMessage.Data | Should BeExactly $testData
         }
         finally {
             Remove-GcpsTopic $topicName
@@ -92,8 +91,8 @@ Describe "Publish-GcpsMessage" {
 
             $subscriptionMessage = Get-SubscriptionMessage -Subscription $subscriptionName
 
-            $subscriptionMessage.Message.MessageId | Should BeExactly $publishedMessage.MessageId
-            (ConvertFrom-Base64String $subscriptionMessage.Message.Data) | Should BeExactly $testData
+            $subscriptionMessage.MessageId | Should BeExactly $publishedMessage.MessageId
+            $subscriptionMessage.Data | Should BeExactly $testData
         }
         finally {
             Remove-GcpsTopic $topicName
@@ -116,9 +115,9 @@ Describe "Publish-GcpsMessage" {
 
             $subscriptionMessage = Get-SubscriptionMessage -Subscription $subscriptionName
 
-            $subscriptionMessage.Message.MessageId | Should BeExactly $publishedMessage.MessageId
-            $subscriptionMessage.Message.Attributes.Key | Should BeExactly "Value"
-            $subscriptionMessage.Message.Attributes.Key2 | Should BeExactly "Value2"
+            $subscriptionMessage.MessageId | Should BeExactly $publishedMessage.MessageId
+            $subscriptionMessage.Attributes.Key | Should BeExactly "Value"
+            $subscriptionMessage.Attributes.Key2 | Should BeExactly "Value2"
         }
         finally {
             Remove-GcpsTopic $topicName
@@ -142,10 +141,10 @@ Describe "Publish-GcpsMessage" {
 
             $subscriptionMessage = Get-SubscriptionMessage -Subscription $subscriptionName
 
-            $subscriptionMessage.Message.MessageId | Should BeExactly $publishedMessage.MessageId
-            (ConvertFrom-Base64String $subscriptionMessage.Message.Data) | Should BeExactly $testData
-            $subscriptionMessage.Message.Attributes.Key | Should BeExactly "Value"
-            $subscriptionMessage.Message.Attributes.Key2 | Should BeExactly "Value2"
+            $subscriptionMessage.MessageId | Should BeExactly $publishedMessage.MessageId
+            $subscriptionMessage.Data | Should BeExactly $testData
+            $subscriptionMessage.Attributes.Key | Should BeExactly "Value"
+            $subscriptionMessage.Attributes.Key2 | Should BeExactly "Value2"
         }
         finally {
             Remove-GcpsTopic $topicName
@@ -174,17 +173,17 @@ Describe "Publish-GcpsMessage" {
             $subscriptionMessages = Get-SubscriptionMessage -Subscription $subscriptionName
             $subscriptionMessages.Count | Should Be 3
 
-            $subscriptionMessageOne = $subscriptionMessages | Where-Object {$_.Message.MessageId -eq $publishedMessage.MessageId}
-            (ConvertFrom-Base64String $subscriptionMessageOne.Message.Data) | Should BeExactly $testData
+            $subscriptionMessageOne = $subscriptionMessages | Where-Object {$_.MessageId -eq $publishedMessage.MessageId}
+            $subscriptionMessageOne.Data | Should BeExactly $testData
 
-            $subscriptionMessageTwo = $subscriptionMessages | Where-Object {$_.Message.MessageId -eq $publishedMessageTwo.MessageId}
-            $subscriptionMessageTwo.Message.Attributes.Key | Should BeExactly "Value"
-            $subscriptionMessageTwo.Message.Attributes.Key2 | Should BeExactly "Value2"
+            $subscriptionMessageTwo = $subscriptionMessages | Where-Object {$_.MessageId -eq $publishedMessageTwo.MessageId}
+            $subscriptionMessageTwo.Attributes.Key | Should BeExactly "Value"
+            $subscriptionMessageTwo.Attributes.Key2 | Should BeExactly "Value2"
 
-            $subscriptionMessageThree = $subscriptionMessages | Where-Object {$_.Message.MessageId -eq $publishedMessageThree.MessageId}
-            (ConvertFrom-Base64String $subscriptionMessageThree.Message.Data) | Should BeExactly $testData
-            $subscriptionMessageThree.Message.Attributes.Key | Should BeExactly "Value"
-            $subscriptionMessageThree.Message.Attributes.Key2 | Should BeExactly "Value2"
+            $subscriptionMessageThree = $subscriptionMessages | Where-Object {$_.MessageId -eq $publishedMessageThree.MessageId}
+            $subscriptionMessageThree.Data | Should BeExactly $testData
+            $subscriptionMessageThree.Attributes.Key | Should BeExactly "Value"
+            $subscriptionMessageThree.Attributes.Key2 | Should BeExactly "Value2"
         }
         finally {
             Remove-GcpsTopic $topicName
@@ -213,17 +212,17 @@ Describe "Publish-GcpsMessage" {
             $subscriptionMessages = Get-SubscriptionMessage -Subscription $subscriptionName
             $subscriptionMessages.Count | Should Be 3
 
-            $subscriptionMessageOne = $subscriptionMessages | Where-Object {$_.Message.MessageId -eq $publishedMessages[0].MessageId}
-            (ConvertFrom-Base64String $subscriptionMessageOne.Message.Data) | Should BeExactly $testData
+            $subscriptionMessageOne = $subscriptionMessages | Where-Object {$_.MessageId -eq $publishedMessages[0].MessageId}
+            $subscriptionMessageOne.Data | Should BeExactly $testData
 
-            $subscriptionMessageTwo = $subscriptionMessages | Where-Object {$_.Message.MessageId -eq $publishedMessages[1].MessageId}
-            $subscriptionMessageTwo.Message.Attributes.Key | Should BeExactly "Value"
-            $subscriptionMessageTwo.Message.Attributes.Key2 | Should BeExactly "Value2"
+            $subscriptionMessageTwo = $subscriptionMessages | Where-Object {$_.MessageId -eq $publishedMessages[1].MessageId}
+            $subscriptionMessageTwo.Attributes.Key | Should BeExactly "Value"
+            $subscriptionMessageTwo.Attributes.Key2 | Should BeExactly "Value2"
 
-            $subscriptionMessageThree = $subscriptionMessages | Where-Object {$_.Message.MessageId -eq $publishedMessages[2].MessageId}
-            (ConvertFrom-Base64String $subscriptionMessageThree.Message.Data) | Should BeExactly $testData
-            $subscriptionMessageThree.Message.Attributes.Key | Should BeExactly "Value"
-            $subscriptionMessageThree.Message.Attributes.Key2 | Should BeExactly "Value2"
+            $subscriptionMessageThree = $subscriptionMessages | Where-Object {$_.MessageId -eq $publishedMessages[2].MessageId}
+            $subscriptionMessageThree.Data | Should BeExactly $testData
+            $subscriptionMessageThree.Attributes.Key | Should BeExactly "Value"
+            $subscriptionMessageThree.Attributes.Key2 | Should BeExactly "Value2"
         }
         finally {
             Remove-GcpsTopic $topicName
@@ -249,17 +248,17 @@ Describe "Publish-GcpsMessage" {
 
             $subscriptionMessage = Get-SubscriptionMessage -Subscription $subscriptionName
 
-            $subscriptionMessage.Message.MessageId | Should BeExactly $publishedMessage.MessageId
-            (ConvertFrom-Base64String $subscriptionMessage.Message.Data) | Should BeExactly $testData
-            $subscriptionMessage.Message.Attributes.Key | Should BeExactly "Value"
-            $subscriptionMessage.Message.Attributes.Key2 | Should BeExactly "Value2"
+            $subscriptionMessage.MessageId | Should BeExactly $publishedMessage.MessageId
+            $subscriptionMessage.Data | Should BeExactly $testData
+            $subscriptionMessage.Attributes.Key | Should BeExactly "Value"
+            $subscriptionMessage.Attributes.Key2 | Should BeExactly "Value2"
 
             $subscriptionMessage = Get-SubscriptionMessage -Subscription $subscriptionNameTwo
 
-            $subscriptionMessage.Message.MessageId | Should BeExactly $publishedMessage.MessageId
-            (ConvertFrom-Base64String $subscriptionMessage.Message.Data) | Should BeExactly $testData
-            $subscriptionMessage.Message.Attributes.Key | Should BeExactly "Value"
-            $subscriptionMessage.Message.Attributes.Key2 | Should BeExactly "Value2"
+            $subscriptionMessage.MessageId | Should BeExactly $publishedMessage.MessageId
+            $subscriptionMessage.Data | Should BeExactly $testData
+            $subscriptionMessage.Attributes.Key | Should BeExactly "Value"
+            $subscriptionMessage.Attributes.Key2 | Should BeExactly "Value2"
         }
         finally {
             Remove-GcpsTopic $topicName
@@ -311,8 +310,8 @@ Describe "Get-GcpsMessage" {
             $subscriptionMessageTwo.AckId | Should Not BeNullOrEmpty
             $subscriptionMessageTwo.Subscription | Should Match $subscriptionName
 
-            # Acknowledge the message with gcloud.
-            gcloud beta pubsub subscriptions ack $subscriptionMessageTwo.Subscription $subscriptionMessageTwo.AckId 2>$null
+            # Acknowledge the message.
+            Send-GcpsAck -InputObject $subscriptionMessageTwo
             # Now if we pull again, we should get nothing.
             $subscriptionMessageThree = Get-GcpsMessage -Subscription $subscriptionName -ReturnImmediately
             $subscriptionMessageThree | Should BeNullOrEmpty

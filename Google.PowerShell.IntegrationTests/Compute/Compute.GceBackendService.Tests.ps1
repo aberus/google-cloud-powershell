@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -16,9 +16,9 @@ Describe "Get-GceBackendService" {
         { Get-GceBackendService $serviceName1 } | Should Throw 404
     }
 
-    gcloud compute http-health-checks create "health-check-$r" 2>$null
-    gcloud compute backend-services create $serviceName1 --http-health-checks "health-check-$r" --global 2>$null
-    gcloud compute backend-services create $serviceName2 --http-health-checks "health-check-$r" --global 2>$null
+    Add-GceHealthCheck "health-check-$r" | Out-Null
+    Add-GceBackendService $serviceName1 -HttpHealthCheck "health-check-$r" | Out-Null
+    Add-GceBackendService $serviceName2 -HttpHealthCheck "health-check-$r" | Out-Null
 
     It "should get all maps" {
         $maps = Get-GceBackendService
@@ -33,9 +33,9 @@ Describe "Get-GceBackendService" {
         $map.Name | Should Be $serviceName1
     }
     
-    gcloud compute backend-services delete $serviceName1 --global -q 2>$null
-    gcloud compute backend-services delete $serviceName2 --global -q 2>$null
-    gcloud compute http-health-checks delete "health-check-$r" -q 2>$null
+    Remove-GceBackendService $serviceName1 -ErrorAction SilentlyContinue
+    Remove-GceBackendService $serviceName2 -ErrorAction SilentlyContinue
+    Remove-GceHealthCheck "health-check-$r" -Http -ErrorAction SilentlyContinue
 }
 
 Reset-GCloudConfig $oldActiveConfig $configName

@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GCloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -20,13 +20,13 @@ Describe "Get-GcLogMetric" {
     $logFilterTwo = "this is another filter"
     $description = "This is the first description"
     $descriptionTwo = "This is the second description"
-    gcloud logging metrics create $script:metricName --description=$description --log-filter=$logFilter --quiet 2>$null
-    gcloud logging metrics create $script:metricNameTwo --description=$descriptionTwo --log-filter=$logFilterTwo --quiet 2>$null
+    New-GcLogMetric -MetricName $script:metricName -Description $description -Filter $logFilter | Out-Null
+    New-GcLogMetric -MetricName $script:metricNameTwo -Description $descriptionTwo -Filter $logFilterTwo | Out-Null
     
 
     AfterAll {
-        gcloud logging metrics delete $metricName --quiet 2>$null
-        gcloud logging metrics delete $metricNameTwo --quiet 2>$null
+        Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
+        Remove-GcLogMetric -MetricName $metricNameTwo -ErrorAction SilentlyContinue
     }
 
     It "should work without any parameters" {
@@ -88,7 +88,7 @@ Describe "New-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -119,8 +119,8 @@ Describe "New-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
-            gcloud logging metrics delete $metricNameTwo --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
+            Remove-GcLogMetric -MetricName $metricNameTwo -ErrorAction SilentlyContinue
         }
     }
 
@@ -139,7 +139,7 @@ Describe "New-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -159,7 +159,7 @@ Describe "New-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -179,7 +179,7 @@ Describe "New-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -200,7 +200,7 @@ Describe "New-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -235,8 +235,8 @@ Describe "New-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
-            gcloud logging metrics delete $metricNameTwo --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
+            Remove-GcLogMetric -MetricName $metricNameTwo -ErrorAction SilentlyContinue
         }
     }
 
@@ -250,7 +250,7 @@ Describe "New-GcLogMetric" {
                 Should Throw "already exists."
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -263,7 +263,7 @@ Describe "New-GcLogMetric" {
                 Should Throw "Cannot construct filter"
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 }
@@ -288,7 +288,7 @@ Describe "Set-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -322,8 +322,8 @@ Describe "Set-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
-            gcloud logging metrics delete $metricNameTwo --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
+            Remove-GcLogMetric -MetricName $metricNameTwo -ErrorAction SilentlyContinue
         }
     }
 
@@ -344,7 +344,7 @@ Describe "Set-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -366,7 +366,7 @@ Describe "Set-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -389,7 +389,7 @@ Describe "Set-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -412,7 +412,7 @@ Describe "Set-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -451,8 +451,8 @@ Describe "Set-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
-            gcloud logging metrics delete $metricNameTwo --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
+            Remove-GcLogMetric -MetricName $metricNameTwo -ErrorAction SilentlyContinue
         }
     }
 
@@ -472,7 +472,7 @@ Describe "Set-GcLogMetric" {
             }
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 
@@ -484,7 +484,7 @@ Describe "Set-GcLogMetric" {
             { Set-GcLogMetric $metricName } | Should Throw "Cannot construct filter"
         }
         finally {
-            gcloud logging metrics delete $metricName --quiet 2>$null
+            Remove-GcLogMetric -MetricName $metricName -ErrorAction SilentlyContinue
         }
     }
 }

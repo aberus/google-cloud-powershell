@@ -171,4 +171,144 @@ namespace Google.PowerShell.Compute
             }
         }
     }
+
+    /// <summary>
+    /// <para type="synopsis">
+    /// Adds a new Google Compute Engine target HTTP proxy.
+    /// </para>
+    /// <para type="description">
+    /// Creates a new target HTTP proxy that references a URL map. Target proxies are used by global forwarding
+    /// rules to route requests through a URL map.
+    /// </para>
+    /// <example>
+    ///   <code>PS C:\> Add-GceTargetProxy "my-proxy" -UrlMap "my-url-map"</code>
+    ///   <para>Creates a target HTTP proxy that uses the URL map "my-url-map".</para>
+    /// </example>
+    /// </summary>
+    [Cmdlet(VerbsCommon.Add, "GceTargetProxy", DefaultParameterSetName = ParameterSetNames.ByValues)]
+    [OutputType(typeof(TargetHttpProxy))]
+    public class AddGceTargetProxyCmdlet : GceConcurrentCmdlet
+    {
+        private class ParameterSetNames
+        {
+            public const string ByValues = "ByValues";
+            public const string ByObject = "ByObject";
+        }
+
+        /// <summary>
+        /// <para type="description">
+        /// The project that will own the target proxy. Defaults to the project in the Cloud SDK config.
+        /// </para>
+        /// </summary>
+        [Parameter]
+        [ConfigPropertyName(CloudSdkSettings.CommonProperties.Project)]
+        public override string Project { get; set; }
+
+        /// <summary>
+        /// <para type="description">The name of the target proxy to create.</para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByValues, Mandatory = true, Position = 0)]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// <para type="description">The name (or self-link) of the URL map the proxy routes requests through.</para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByValues, Mandatory = true)]
+        public string UrlMap { get; set; }
+
+        /// <summary>
+        /// <para type="description">Human readable description of the target proxy.</para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByValues)]
+        public string Description { get; set; }
+
+        /// <summary>
+        /// <para type="description">A TargetHttpProxy object describing the target proxy to create.</para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByObject, Mandatory = true,
+            Position = 0, ValueFromPipeline = true)]
+        public TargetHttpProxy Object { get; set; }
+
+        protected override void ProcessRecord()
+        {
+            TargetHttpProxy body;
+            if (ParameterSetName == ParameterSetNames.ByObject)
+            {
+                body = Object;
+            }
+            else
+            {
+                body = new TargetHttpProxy
+                {
+                    Name = Name,
+                    Description = Description,
+                    UrlMap = BuildGlobalResourceUri(Project, "urlMaps", UrlMap)
+                };
+            }
+
+            string name = body.Name;
+            Operation operation = Service.TargetHttpProxies.Insert(body, Project).Execute();
+            AddGlobalOperation(Project, operation,
+                () => WriteObject(Service.TargetHttpProxies.Get(Project, name).Execute()));
+        }
+    }
+
+    /// <summary>
+    /// <para type="synopsis">
+    /// Removes a Google Compute Engine target HTTP proxy.
+    /// </para>
+    /// <para type="description">
+    /// Deletes the named target HTTP proxy from the given project.
+    /// </para>
+    /// <example>
+    ///   <code>PS C:\> Remove-GceTargetProxy "my-proxy"</code>
+    ///   <para>Removes the target HTTP proxy named "my-proxy".</para>
+    /// </example>
+    /// </summary>
+    [Cmdlet(VerbsCommon.Remove, "GceTargetProxy", SupportsShouldProcess = true,
+        DefaultParameterSetName = ParameterSetNames.ByName)]
+    public class RemoveGceTargetProxyCmdlet : GceConcurrentCmdlet
+    {
+        private class ParameterSetNames
+        {
+            public const string ByName = "ByName";
+            public const string ByObject = "ByObject";
+        }
+
+        /// <summary>
+        /// <para type="description">
+        /// The project that owns the target proxy. Defaults to the project in the Cloud SDK config.
+        /// </para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByName)]
+        [ConfigPropertyName(CloudSdkSettings.CommonProperties.Project)]
+        public override string Project { get; set; }
+
+        /// <summary>
+        /// <para type="description">The name of the target proxy to remove.</para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByName, Mandatory = true,
+            Position = 0, ValueFromPipeline = true)]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// <para type="description">The TargetHttpProxy object to remove.</para>
+        /// </summary>
+        [Parameter(ParameterSetName = ParameterSetNames.ByObject, Mandatory = true,
+            Position = 0, ValueFromPipeline = true)]
+        public TargetHttpProxy Object { get; set; }
+
+        protected override void ProcessRecord()
+        {
+            string project = ParameterSetName == ParameterSetNames.ByObject
+                ? GetProjectNameFromUri(Object.SelfLink) : Project;
+            string name = ParameterSetName == ParameterSetNames.ByObject ? Object.Name : Name;
+
+            if (ShouldProcess($"{project}/{name}", "Remove-GceTargetProxy"))
+            {
+                Operation operation = Service.TargetHttpProxies.Delete(project, name).Execute();
+                AddGlobalOperation(project, operation);
+            }
+        }
+    }
 }

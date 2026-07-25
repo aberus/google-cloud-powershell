@@ -8,7 +8,7 @@ function Remove-ProjectDisks($project) {
     Write-Host "Deleting all GCE disks for $project..."
     $disks = Get-GceDisk -Project $project
     foreach ($disk in $disks) {
-        gcloud compute disks delete --project $project $disk.Name --zone $disk.Zone --quiet 2>$null
+        Remove-GceDisk $disk -ErrorAction SilentlyContinue
     }
 
     $disks = Get-GceDisk -Project $project
@@ -22,9 +22,9 @@ function Remove-ProjectDisks($project) {
 Describe "Get-GceDisk" {
     Remove-ProjectDisks($project)
     # Create test disks.
-    gcloud compute disks create --project $project "test-disk-1" --zone "us-central1-a" --size 20 --quiet 2>$null
-    gcloud compute disks create --project $project "test-disk-2" --zone "us-central1-a" --size 20 --quiet 2>$null
-    gcloud compute disks create --project $project "test-disk-1" --zone "us-central1-b" --size 20 --quiet 2>$null
+    New-GceDisk -Project $project -DiskName "test-disk-1" -Zone "us-central1-a" -SizeGb 20 | Out-Null
+    New-GceDisk -Project $project -DiskName "test-disk-2" -Zone "us-central1-a" -SizeGb 20 | Out-Null
+    New-GceDisk -Project $project -DiskName "test-disk-1" -Zone "us-central1-b" -SizeGb 20 | Out-Null
 
     It "should work" {
         $disks = Get-GceDisk -Project $project

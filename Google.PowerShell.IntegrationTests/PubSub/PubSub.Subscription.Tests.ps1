@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GCloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -6,8 +6,7 @@ $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
 function GetSubscription($subscription, $topic)
 {
     $subscriptionName = "projects/$project/subscriptions/$subscription"
-    $subscriptionsJson = [string](gcloud beta pubsub subscriptions list --quiet 2>$null --format=json)
-    $subscriptions = ConvertFrom-Json $subscriptionsJson
+    $subscriptions = Get-GcpsSubscription
     $subscriptions | Where-Object {$_.Name -eq "$subscriptionName"}
 }
 
@@ -27,8 +26,8 @@ Describe "New-GcpsSubscription" {
             $subscription.PushConfig.PushEndpoint | Should BeNullOrEmpty
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
         }
     }
 
@@ -47,8 +46,8 @@ Describe "New-GcpsSubscription" {
             $subscription.PushConfig.PushEndpoint | Should BeNullOrEmpty
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
         }
     }
 
@@ -67,8 +66,8 @@ Describe "New-GcpsSubscription" {
             $subscription.PushConfig.PushEndpoint | Should BeNullOrEmpty
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
         }
     }
 
@@ -91,8 +90,8 @@ Describe "New-GcpsSubscription" {
             $subscription.PushConfig.PushEndpoint | Should Be $endpoint
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
         }
     }
 
@@ -105,7 +104,7 @@ Describe "New-GcpsSubscription" {
             { New-GcpsSubscription -Topic $topicName -Subscription "!!" -ErrorAction Stop } | Should Throw "Invalid resource name"
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
         }
     }
 
@@ -125,7 +124,7 @@ Describe "New-GcpsSubscription" {
                 Should Throw "Invalid ack deadline given"
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
         }
     }
 
@@ -139,7 +138,7 @@ Describe "New-GcpsSubscription" {
                 Should Throw "Topic 'projects/$project/topics/$topicName' does not exist"
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
         }
     }
 
@@ -155,8 +154,8 @@ Describe "New-GcpsSubscription" {
                 Should Throw "it already exists"
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
         }
     }
 
@@ -175,8 +174,8 @@ Describe "New-GcpsSubscription" {
                                  Should Throw "Invalid push endpoint given"
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
         }
     }
 }
@@ -198,9 +197,9 @@ Describe "Get-GcpsSubscription" {
             $subscriptions | Where-Object {$_.Name -like "*$subscriptionName2*"} | Should Not BeNullOrEmpty
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName2 --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName2 -ErrorAction SilentlyContinue
         }
     }
 
@@ -245,12 +244,12 @@ Describe "Get-GcpsSubscription" {
             $subscriptions2 | Where-Object {$_.Name -like "*$subscriptionName4*"} | Should Not BeNullOrEmpty
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName2 --quiet 2>$null
-            gcloud beta pubsub topics delete $topicName2 --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName3 --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName4 --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName2 -ErrorAction SilentlyContinue
+            Remove-GcpsTopic -Topic $topicName2 -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName3 -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName4 -ErrorAction SilentlyContinue
         }
     }
 
@@ -278,10 +277,10 @@ Describe "Get-GcpsSubscription" {
             $subscriptions2 | Where-Object {$_.Name -like "*$subscriptionName3*"} | Should Not BeNullOrEmpty
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName2 --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName3 --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName2 -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName3 -ErrorAction SilentlyContinue
         }
     }
 
@@ -328,14 +327,14 @@ Describe "Get-GcpsSubscription" {
             $subscriptions3 | Where-Object {$_.Name -like "*$subscriptionName6*"} | Should Not BeNullOrEmpty
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName2 --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName3 --quiet 2>$null
-            gcloud beta pubsub topics delete $topicName2 --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName4 --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName5 --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName6 --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName2 -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName3 -ErrorAction SilentlyContinue
+            Remove-GcpsTopic -Topic $topicName2 -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName4 -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName5 -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName6 -ErrorAction SilentlyContinue
         }
     }
 
@@ -388,8 +387,8 @@ Describe "Set-GcpsSubscriptionConfig" {
             $subscription.PushConfig.PushEndpoint | Should BeNullOrEmpty
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
         }
     }
 
@@ -415,8 +414,8 @@ Describe "Set-GcpsSubscriptionConfig" {
             $subscription.PushConfig.PushEndpoint | Should Be $endpoint
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
         }
     }
 
@@ -440,8 +439,8 @@ Describe "Set-GcpsSubscriptionConfig" {
             $subscription.PushConfig.PushEndpoint | Should BeNullOrEmpty
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
         }
     }
 
@@ -469,9 +468,9 @@ Describe "Set-GcpsSubscriptionConfig" {
             $subscriptions | ForEach-Object { $_.PushConfig.PushEndpoint | Should BeNullOrEmpty }
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName2 --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName2 -ErrorAction SilentlyContinue
         }
     }
 
@@ -500,8 +499,8 @@ Describe "Set-GcpsSubscriptionConfig" {
                                  Should Throw "Invalid push endpoint given"
         }
         finally {
-            gcloud beta pubsub topics delete $topicName --quiet 2>$null
-            gcloud beta pubsub subscriptions delete $subscriptionName --quiet 2>$null
+            Remove-GcpsTopic -Topic $topicName -ErrorAction SilentlyContinue
+            Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
         }
     }
 }
@@ -531,7 +530,7 @@ Describe "Remove-GcpsSubscription" {
             { Get-GcpsSubscription -Subscription $subscriptionTwo, $subscriptionThree -ErrorAction Stop } | Should Throw "does not exist"
         }
         finally {
-            gcloud beta pubsub topics delete $topic --quiet 2>$null
+            Remove-GcpsTopic -Topic $topic -ErrorAction SilentlyContinue
         }
     }
 
@@ -551,7 +550,7 @@ Describe "Remove-GcpsSubscription" {
             { Get-GcpsSubscription -Subscription $subscription -ErrorAction Stop } | Should Throw "does not exist"
         }
         finally {
-            gcloud beta pubsub topics delete $topic --quiet 2>$null
+            Remove-GcpsTopic -Topic $topic -ErrorAction SilentlyContinue
         }
     }
 
@@ -571,7 +570,7 @@ Describe "Remove-GcpsSubscription" {
             { Get-GcpsSubscription -Subscription $subscription -ErrorAction Stop } | Should Throw "does not exist"
         }
         finally {
-            gcloud beta pubsub topics delete $topic --quiet 2>$null
+            Remove-GcpsTopic -Topic $topic -ErrorAction SilentlyContinue
         }
     }
 
@@ -601,7 +600,7 @@ Describe "Remove-GcpsSubscription" {
             Remove-GcpsSubscription -Subscription $subscription
         }
         finally {
-            gcloud beta pubsub topics delete $topic --quiet 2>$null
+            Remove-GcpsTopic -Topic $topic -ErrorAction SilentlyContinue
         }
     }
 }

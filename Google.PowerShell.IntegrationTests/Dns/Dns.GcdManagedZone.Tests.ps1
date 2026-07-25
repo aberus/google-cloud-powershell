@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\Dns\GcdCmdlets.ps1
+. $PSScriptRoot\..\Dns\GcdCmdlets.ps1
 Install-GcloudCmdlets
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
 
@@ -28,8 +28,8 @@ Describe "Get-GcdManagedZone" {
     }
 
     # Create 2 test zones
-    gcloud dns managed-zones create --dns-name=$dnsName1 --description=$testDescrip1 $testZone1 --project=$project 2>$null
-    gcloud dns managed-zones create --dns-name=$dnsName2 --description=$testDescrip2 $testZone2 --project=$project 2>$null
+    Add-GcdManagedZone -Name $testZone1 -DnsName $dnsName1 -Description $testDescrip1 -Project $project | Out-Null
+    Add-GcdManagedZone -Name $testZone2 -DnsName $dnsName2 -Description $testDescrip2 -Project $project | Out-Null
 
     It "should work and list the 2 ManagedZones just created" {
         $zones = Get-GcdManagedZone -Project $project

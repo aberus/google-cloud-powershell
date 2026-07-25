@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GCloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -21,14 +21,14 @@ Describe "Get-GcLogSink" {
     New-GcsBucket $bucketOne
     New-GcsBucket $bucketTwo
     Start-Sleep 2
-    gcloud logging sinks create $script:sinkName $destination --log-filter=$logFilter --quiet 2>$null
-    gcloud logging sinks create $script:secondSinkName $destinationTwo --quiet 2>$null
+    New-GcLogSink $script:sinkName -GcsBucketDestination $bucketOne -Filter $logFilter | Out-Null
+    New-GcLogSink $script:secondSinkName -GcsBucketDestination $bucketTwo | Out-Null
     
     AfterAll {
         Remove-GcsBucket $bucketOne -Force
         Remove-GcsBucket $bucketTwo -Force
-        gcloud logging sinks delete $sinkName --quiet 2>$null
-        gcloud logging sinks delete $secondSinkName --quiet 2>$null
+        Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
+        Remove-GcLogSink -SinkName $secondSinkName -ErrorAction SilentlyContinue
     }
 
     It "should work without any parameters" {
@@ -121,7 +121,7 @@ Describe "New-GcLogSink" {
         }
         finally {
             Remove-GcsBucket $bucket -Force
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
         }
     }
 
@@ -145,7 +145,7 @@ Describe "New-GcLogSink" {
         }
         finally {
             Remove-BqDataset $dataset
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
         }
     }
 
@@ -165,7 +165,7 @@ Describe "New-GcLogSink" {
                            -WriterIdentity $script:cloudLogServiceAccount
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
         }
     }
 
@@ -194,8 +194,8 @@ Describe "New-GcLogSink" {
                            -Sink $createdSink
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
-            gcloud logging sinks delete $sinkNameTwo --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
+            Remove-GcLogSink -SinkName $sinkNameTwo -ErrorAction SilentlyContinue
         }
     }
 
@@ -221,7 +221,7 @@ Describe "New-GcLogSink" {
                            -Sink $createdSink
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
             Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
             Remove-GcLog $logName -ErrorAction SilentlyContinue
             Remove-GcLog $secondLogName -ErrorAction SilentlyContinue
@@ -251,7 +251,7 @@ Describe "New-GcLogSink" {
                            -Sink $createdSink
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
             Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
             Remove-GcLog $logName -ErrorAction SilentlyContinue
         }
@@ -280,7 +280,7 @@ Describe "New-GcLogSink" {
                            -Sink $createdSink
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
             Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
             Remove-GcLog $logName -ErrorAction SilentlyContinue
         }
@@ -300,7 +300,7 @@ Describe "New-GcLogSink" {
                 Should Throw "already exists"
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
         }
     }
 }
@@ -350,7 +350,7 @@ Describe "Set-GcLogSink" {
         finally {
             Remove-GcsBucket $bucket -Force
             Remove-GcsBucket $bucketTwo -Force
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
         }
     }
 
@@ -380,7 +380,7 @@ Describe "Set-GcLogSink" {
         finally {
             Remove-BqDataset $dataset
             Remove-BqDataset $datasetTwo
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
         }
     }
 
@@ -404,7 +404,7 @@ Describe "Set-GcLogSink" {
                            -WriterIdentity $script:cloudLogServiceAccount
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
         }
     }
 
@@ -443,8 +443,8 @@ Describe "Set-GcLogSink" {
         finally {
             Remove-GcsBucket $bucket -Force
             Remove-GcsBucket $bucketTwo -Force
-            gcloud logging sinks delete $sinkName --quiet 2>$null
-            gcloud logging sinks delete $sinkNameTwo --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
+            Remove-GcLogSink -SinkName $sinkNameTwo -ErrorAction SilentlyContinue
         }
     }
 
@@ -479,7 +479,7 @@ Describe "Set-GcLogSink" {
                            -Sink $secondUpdatedSink
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
         }
     }
 
@@ -515,7 +515,7 @@ Describe "Set-GcLogSink" {
             $messageJson.TextPayload | Should BeExactly $textPayload
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
             Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
             Remove-GcLog $logName -ErrorAction SilentlyContinue
             Remove-GcLog $secondLogName -ErrorAction SilentlyContinue
@@ -550,7 +550,7 @@ Describe "Set-GcLogSink" {
                            -Sink $createdSink
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
             Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
             Remove-GcLog $logName -ErrorAction SilentlyContinue
         }
@@ -584,7 +584,7 @@ Describe "Set-GcLogSink" {
                            -Sink $createdSink
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
             Remove-GcpsSubscription -Subscription $subscriptionName -ErrorAction SilentlyContinue
             Remove-GcLog $logName -ErrorAction SilentlyContinue
         }
@@ -605,7 +605,7 @@ Describe "Set-GcLogSink" {
                            -WriterIdentity $script:cloudLogServiceAccount
         }
         finally {
-            gcloud logging sinks delete $sinkName --quiet 2>$null
+            Remove-GcLogSink -SinkName $sinkName -ErrorAction SilentlyContinue
         }
     }
 

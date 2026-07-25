@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GCloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -9,23 +9,23 @@ Describe "Get-GcLogEntry" {
     $script:secondLogName = "gcp-testing-log2-$r"
     $textPayload = "Test entry"
     $secondTextPayload = "Second test entry"
-    $jsonPayload = "{\`"Key\`":\`"Value\`"}"
+    $jsonPayload = @{ "Key" = "Value" }
     $timeBeforeCreatingLogs = [DateTime]::Now
-    gcloud logging write $logName $textPayload --severity=ALERT 2>$null
-    gcloud logging write $logName $jsonPayload --severity=INFO --payload-type=json 2>$null
-    gcloud logging write $secondLogName $secondTextPayload --severity=ALERT 2>$null
-    gcloud logging write $secondLogName $jsonPayload --severity=INFO --payload-type=json 2>$null
+    New-GcLogEntry -LogName $logName -TextPayload $textPayload -Severity Alert | Out-Null
+    New-GcLogEntry -LogName $logName -JsonPayload $jsonPayload -Severity Info | Out-Null
+    New-GcLogEntry -LogName $secondLogName -TextPayload $secondTextPayload -Severity Alert | Out-Null
+    New-GcLogEntry -LogName $secondLogName -JsonPayload $jsonPayload -Severity Info | Out-Null
     # We add 2 minutes to account for delay in log creation
     $timeAfterCreatingLogs = [DateTime]::Now.AddMinutes(2)
 
     AfterAll {
-        gcloud logging logs delete $logName --quiet 2>$null
+        Remove-GcLog -LogName $logName -ErrorAction SilentlyContinue
         $logs = Get-GcLogEntry -LogName $logName
         if ($null -ne $logs)
         {
             Write-Host "Log $logName is not deleted."
         }
-        gcloud logging logs delete $secondLogName --quiet 2>$null
+        Remove-GcLog -LogName $secondLogName -ErrorAction SilentlyContinue
         $logs = Get-GcLogEntry -LogName $secondLogName
         if ($null -ne $logs)
         {
@@ -95,7 +95,7 @@ Describe "Get-GcLogEntry" {
         $gceInstanceLogEntries = Get-GcLogEntry -ResourceType gce_instance | Select -First 2
         $gceInstanceLogEntries.Resource | ForEach-Object { $_.Type | Should BeExactly gce_instance }
 
-        # The gcloud logging write uses global resource type.
+        # New-GcLogEntry uses the global resource type by default.
         $globalResourceTypeLogEntries = Get-GcLogEntry -ResourceType global -LogName $logName
         $globalResourceTypeLogEntries.Count | Should Be 2
         $globalResourceTypeLogEntries[0].Resource.Type | Should BeExactly global
@@ -166,7 +166,7 @@ Describe "New-GcLogEntry" {
             $protoLogEntry.ProtoPayload["serviceName"] | Should BeExactly $proto["serviceName"]
         }
         finally {
-            gcloud logging logs delete $logName --quiet 2>$null
+            Remove-GcLog -LogName $logName -ErrorAction SilentlyContinue
         }
     }
 
@@ -198,7 +198,7 @@ Describe "New-GcLogEntry" {
             $logEntriesProtoPayloads.Count | Should Be 2
         }
         finally {
-            gcloud logging logs delete $logName --quiet 2>$null
+            Remove-GcLog -LogName $logName -ErrorAction SilentlyContinue
         }
     }
 
@@ -219,7 +219,7 @@ Describe "New-GcLogEntry" {
             $logEntriesJsonPayload.JsonPayload["Key"] | Should BeExactly "Value"
         }
         finally {
-            gcloud logging logs delete $logName --quiet 2>$null
+            Remove-GcLog -LogName $logName -ErrorAction SilentlyContinue
         }
     }
 
@@ -241,7 +241,7 @@ Describe "New-GcLogEntry" {
             $logEntry.Resource.Labels["database_id"] | Should BeExactly $resourceLabels["database_id"]
         }
         finally {
-            gcloud logging logs delete $logName --quiet 2>$null
+            Remove-GcLog -LogName $logName -ErrorAction SilentlyContinue
         }
     }
 }
@@ -273,8 +273,8 @@ Describe "Get-GcLog" {
             $logs -contains $logFullName2 | Should Be $true
         }
         finally {
-            gcloud logging logs delete $logName --quiet 2>$null
-            gcloud logging logs delete $logName2 --quiet 2>$null
+            Remove-GcLog -LogName $logName -ErrorAction SilentlyContinue
+            Remove-GcLog -LogName $logName2 -ErrorAction SilentlyContinue
         }
     }
 }

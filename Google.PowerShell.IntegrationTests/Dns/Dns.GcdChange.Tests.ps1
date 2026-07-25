@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\Dns\GcdCmdlets.ps1
+. $PSScriptRoot\..\Dns\GcdCmdlets.ps1
 Install-GcloudCmdlets
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
 
@@ -24,7 +24,7 @@ Describe "Get-GcdChange" {
     }
 
     # Create zone for testing 
-    gcloud dns managed-zones create --dns-name=$dnsName1 --description="testing zone, 1" $testZone1 --project=$project 2>$null
+    Add-GcdManagedZone -Name $testZone1 -DnsName $dnsName1 -Description "testing zone, 1" -Project $project | Out-Null
     
     # Make 2 new changes for testing by adding and immediately deleting an CNAME-type record to the test zone
     Add-GcdChange -Project $project -Zone $testZone1 -Add $testRrsetA
@@ -72,13 +72,11 @@ Describe "Add-GcdChange" {
     }
 
     # Create 2 zones for testing
-    gcloud dns managed-zones create --dns-name=$dnsName1 --description=$testDescrip1 $testZone1 --project=$project 2>$null
-    gcloud dns managed-zones create --dns-name=$dnsName1 --description=$testDescrip2 $testZone2 --project=$project 2>$null
+    Add-GcdManagedZone -Name $testZone1 -DnsName $dnsName1 -Description $testDescrip1 -Project $project | Out-Null
+    Add-GcdManagedZone -Name $testZone2 -DnsName $dnsName1 -Description $testDescrip2 -Project $project | Out-Null
     
     # Make a new change for testing by adding a CNAME-type record to test zone 2 (testRrsetCNAME equivalent)
-    gcloud dns record-sets transaction start --zone=$testZone2 --project=$project 2>$null
-    gcloud dns record-sets transaction add --name=$dnsName1_2 --type=CNAME --ttl=$ttl1 $rrdataCNAME1_2 --zone=$testZone2 --project=$project 2>$null
-    gcloud dns record-sets transaction execute --zone=$testZone2 --project=$project 2>$null
+    Add-GcdChange -Project $project -Zone $testZone2 -Add (New-GcdResourceRecordSet $dnsName1_2 $rrdataCNAME1_2 "CNAME" -Ttl $ttl1) | Out-Null
 
     # Copy Change request for later use
     $copyChange = (Get-GcdChange -Project $project -Zone $testZone2)[0]
@@ -119,9 +117,7 @@ Describe "Add-GcdChange" {
     }
 
     # Make a new change for testing by adding a TXT-type record to test zone 1
-    gcloud dns record-sets transaction start --zone=$testZone1 --project=$project 2>$null
-    gcloud dns record-sets transaction add --name=$dnsName1 --type=TXT --ttl=$ttl1 $rrdataTXT1 --zone=$testZone1 --project=$project 2>$null
-    gcloud dns record-sets transaction execute --zone=$testZone1 --project=$project 2>$null
+    Add-GcdChange -Project $project -Zone $testZone1 -Add (New-GcdResourceRecordSet $dnsName1 $rrdataTXT1 "TXT" -Ttl $ttl1) | Out-Null
 
     # Create ResourceRecordSets that can be added and removed
     $rmRrset1 = $testRrsetCNAME

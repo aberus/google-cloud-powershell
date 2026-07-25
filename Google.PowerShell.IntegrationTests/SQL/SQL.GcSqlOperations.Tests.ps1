@@ -1,10 +1,10 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 $project, $_, $oldActiveConfig, $configName = Set-GCloudConfig
 
 Describe "Get-GcSqlOperations" {
 
-    gcloud sql instances create "test-ops" --quiet 2>$null
+    New-GcSqlSettingConfig | New-GcSqlInstanceConfig "test-ops" | Add-GcSqlInstance -ErrorAction SilentlyContinue | Out-Null
     $instance = "test-ops"
 
     It "should get a reasonable response" {
@@ -38,6 +38,6 @@ Describe "Get-GcSqlOperations" {
         $operation.operationType | Should Be "Create"
     }
 
-    gcloud sql instances delete "test-ops" --quiet 2>$null
+    Remove-GcSqlInstance -Instance "test-ops" -ErrorAction SilentlyContinue
 }
 Reset-GCloudConfig $oldActiveConfig $configName

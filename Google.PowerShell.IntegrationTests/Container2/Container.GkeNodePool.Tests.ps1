@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -59,7 +59,7 @@ Describe "Get-GkeNodePool" {
     $additionalNodePool = "get-gkenodepool-$r"
 
     # Create an additional node pool.
-    gcloud container node-pools create $additionalNodePool --zone $zone --cluster $clusterOneName 2>$null
+    Add-GkeNodePool -NodePoolName $additionalNodePool -Zone $zone -ClusterName $clusterOneName | Out-Null
 
     It "should work" {
         $nodePools = Get-GkeNodePool -ClusterName $clusterOneName

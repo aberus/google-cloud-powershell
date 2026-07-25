@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -19,9 +19,9 @@ Describe "Get-GceTargetPool"{
 
     Context "with data" {
         BeforeAll {
-            gcloud compute target-pools create $poolName1 --region us-central1 2>$null
+            Add-GceTargetPool $poolName1 -Region us-central1 | Out-Null
 
-            gcloud compute target-pools create $poolName2 --region asia-east1 2>$null
+            Add-GceTargetPool $poolName2 -Region asia-east1 | Out-Null
         }
 
         It "should get all rules" {
@@ -45,8 +45,8 @@ Describe "Get-GceTargetPool"{
         }
 
         AfterAll {
-            gcloud compute target-pools delete $poolName1 --region us-central1 -q 2>$null
-            gcloud compute target-pools delete $poolName2 --region asia-east1 -q 2>$null
+            Remove-GceTargetPool $poolName1 -Region us-central1 -ErrorAction SilentlyContinue
+            Remove-GceTargetPool $poolName2 -Region asia-east1 -ErrorAction SilentlyContinue
         }
     }
 }
@@ -54,7 +54,7 @@ Describe "Get-GceTargetPool"{
 Describe "Set-GceTargetPool" {
     $instance = Add-GceInstance "instance-$r" -BootDiskImage (Get-GceImage -Family "coreos-stable")
     $poolName = "pool-$r"
-    gcloud compute target-pools create $poolName --region us-central1 2>$null
+    Add-GceTargetPool $poolName -Region us-central1 | Out-Null
     $poolObj = Get-GceTargetPool $poolName
     It "should add instance with object" {
         $pool = $poolObj | Set-GceTargetPool -AddInstance $instance
@@ -77,7 +77,7 @@ Describe "Set-GceTargetPool" {
         $pool.Instances.Count | Should Be 0
     }
 
-    gcloud compute target-pools delete $poolName --region us-central1 -q 2>$null
+    Remove-GceTargetPool $poolName -Region us-central1 -ErrorAction SilentlyContinue
     $instance | Remove-GceInstance
 }
 

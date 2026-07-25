@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 $project, $_, $oldActiveConfig, $configName = Set-GCloudConfig
 
@@ -12,7 +12,7 @@ Describe "Start-GcSqlReplica" {
         # A random number is used to avoid collisions with the speed of creating and deleting instances/replicas.
         $r = Get-Random
         $replica = "test-repl$r"
-        gcloud sql instances create $replica --master-instance-name $masterInstance --tier $2ndGenTier --replication SYNCHRONOUS --quiet 2>$null
+        New-GcSqlSettingConfig $2ndGenTier -ReplicationType SYNCHRONOUS | New-GcSqlInstanceConfig $replica -MasterInstanceName $masterInstance | Add-GcSqlInstance | Out-Null
         try {
             Start-GcSqlReplica -Replica $replica
 
@@ -24,7 +24,7 @@ Describe "Start-GcSqlReplica" {
             $operations[1].OperationType | Should Match "CREATE_REPLICA"
         }
         finally {
-            gcloud sql instances delete $replica --quiet 2>$null
+            Remove-GcSqlInstance -Instance $replica -ErrorAction SilentlyContinue
         }
     }
 
@@ -32,7 +32,7 @@ Describe "Start-GcSqlReplica" {
          # A random number is used to avoid collisions with the speed of creating and deleting instances/replicas.
         $r = Get-Random
         $replica = "test-repl$r"
-        gcloud sql instances create $replica --master-instance-name $masterInstance --tier $2ndGenTier --replication SYNCHRONOUS --quiet 2>$null
+        New-GcSqlSettingConfig $2ndGenTier -ReplicationType SYNCHRONOUS | New-GcSqlInstanceConfig $replica -MasterInstanceName $masterInstance | Add-GcSqlInstance | Out-Null
         try {
             Get-GcSqlInstance -Name $replica | Start-GcSqlReplica
 
@@ -44,7 +44,7 @@ Describe "Start-GcSqlReplica" {
             $operations[1].OperationType | Should Match "CREATE_REPLICA"
         }
         finally {
-            gcloud sql instances delete $replica --quiet 2>$null
+            Remove-GcSqlInstance -Instance $replica -ErrorAction SilentlyContinue
         }
      }
 
@@ -58,7 +58,7 @@ Describe "Start-GcSqlReplica" {
          # A random number is used to avoid collisions with the speed of creating and deleting instances/replicas.
         $r = Get-Random
         $replica = "test-repl$r"
-        gcloud sql instances create $replica --master-instance-name $masterInstance --tier $2ndGenTier --replication SYNCHRONOUS --project $defaultProject --quiet 2>$null
+        New-GcSqlSettingConfig $2ndGenTier -ReplicationType SYNCHRONOUS | New-GcSqlInstanceConfig $replica -MasterInstanceName $masterInstance | Add-GcSqlInstance -Project $defaultProject | Out-Null
         try {
             Get-GcSqlInstance -Project $defaultProject -Name $replica | Start-GcSqlReplica
 
@@ -70,7 +70,7 @@ Describe "Start-GcSqlReplica" {
             $operations[1].OperationType | Should Match "CREATE_REPLICA"
         }
         finally {
-            gcloud sql instances delete $replica --project $defaultProject --quiet 2>$null
+            Remove-GcSqlInstance -Instance $replica -Project $defaultProject -ErrorAction SilentlyContinue
 
             # Reset gcloud config back to default project (gcloud-powershell-testing)
             gcloud config set project $defaultProject 2>$null
@@ -88,7 +88,7 @@ Describe "Stop-GcSqlReplica" {
         # A random number is used to avoid collisions with the speed of creating and deleting instances/replicas.
         $r = Get-Random
         $replica = "test-repl$r"
-        gcloud sql instances create $replica --master-instance-name $masterInstance --tier $2ndGenTier --replication SYNCHRONOUS --quiet 2>$null
+        New-GcSqlSettingConfig $2ndGenTier -ReplicationType SYNCHRONOUS | New-GcSqlInstanceConfig $replica -MasterInstanceName $masterInstance | Add-GcSqlInstance | Out-Null
         try {
             Stop-GcSqlReplica -Replica $replica
 
@@ -100,7 +100,7 @@ Describe "Stop-GcSqlReplica" {
             $operations[1].OperationType | Should Match "CREATE_REPLICA"
         }
         finally {
-            gcloud sql instances delete $replica --quiet 2>$null
+            Remove-GcSqlInstance -Instance $replica -ErrorAction SilentlyContinue
         }
     }
 
@@ -108,7 +108,7 @@ Describe "Stop-GcSqlReplica" {
          # A random number is used to avoid collisions with the speed of creating and deleting instances/replicas.
         $r = Get-Random
         $replica = "test-repl$r"
-        gcloud sql instances create $replica --master-instance-name $masterInstance --tier $2ndGenTier --replication SYNCHRONOUS --quiet 2>$null
+        New-GcSqlSettingConfig $2ndGenTier -ReplicationType SYNCHRONOUS | New-GcSqlInstanceConfig $replica -MasterInstanceName $masterInstance | Add-GcSqlInstance | Out-Null
         try {
             Get-GcSqlInstance -Name $replica | Stop-GcSqlReplica
 
@@ -120,7 +120,7 @@ Describe "Stop-GcSqlReplica" {
             $operations[1].OperationType | Should Match "CREATE_REPLICA"
         }
         finally {
-            gcloud sql instances delete $replica --quiet 2>$null
+            Remove-GcSqlInstance -Instance $replica -ErrorAction SilentlyContinue
         }
      }
 
@@ -135,7 +135,7 @@ Describe "Stop-GcSqlReplica" {
              # A random number is used to avoid collisions with the speed of creating and deleting instances/replicas.
             $r = Get-Random
             $replica = "test-repl$r"
-            gcloud sql instances create $replica --master-instance-name $masterInstance --tier $2ndGenTier --replication SYNCHRONOUS --project $defaultProject --quiet 2>$null
+            New-GcSqlSettingConfig $2ndGenTier -ReplicationType SYNCHRONOUS | New-GcSqlInstanceConfig $replica -MasterInstanceName $masterInstance | Add-GcSqlInstance -Project $defaultProject | Out-Null
             Get-GcSqlInstance -Project $defaultProject -Name $replica | Stop-GcSqlReplica
 
             $operations = Get-GcSqlOperation -Project $defaultProject -Instance $replica
@@ -146,7 +146,7 @@ Describe "Stop-GcSqlReplica" {
             $operations[1].OperationType | Should Match "CREATE_REPLICA"
         }
         finally {
-            gcloud sql instances delete $replica --project $defaultProject --quiet 2>$null
+            Remove-GcSqlInstance -Instance $replica -Project $defaultProject -ErrorAction SilentlyContinue
 
             # Reset gcloud config back to default project (gcloud-powershell-testing)
             gcloud config set project $defaultProject 2>$null

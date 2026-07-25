@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -6,7 +6,7 @@ $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
 Describe "Get-GceNetwork" {
     $r = Get-Random
     $newNetwork = "test-network-$r"
-    gcloud compute networks create $newNetwork 2>$null
+    New-GceNetwork -Name $newNetwork | Out-Null
 
     It "should fail for wrong project" {
         { Get-GceNetwork -Project "asdf" } | Should Throw 403
@@ -31,7 +31,7 @@ Describe "Get-GceNetwork" {
         $network.Count | Should Be 2
     }
 
-    gcloud compute networks delete $newNetwork -q 2>$null
+    Remove-GceNetwork -Name $newNetwork -ErrorAction SilentlyContinue
 }
 
 Describe "New-GceNetwork" {
@@ -52,7 +52,7 @@ Describe "New-GceNetwork" {
             $network.Subnetworks | Should BeNullOrEmpty
         }
         finally {
-            gcloud compute networks delete $networkName -q 2>$null
+            Remove-GceNetwork -Name $networkName -ErrorAction SilentlyContinue
         }
     }
 
@@ -71,7 +71,7 @@ Describe "New-GceNetwork" {
             $network.Subnetworks | Should Not BeNullOrEmpty
         }
         finally {
-            gcloud compute networks delete $networkName -q 2>$null
+            Remove-GceNetwork -Name $networkName -ErrorAction SilentlyContinue
         }
     }
 
@@ -92,7 +92,7 @@ Describe "New-GceNetwork" {
             $network.Subnetworks | Should BeNullOrEmpty
         }
         finally {
-            gcloud compute networks delete $networkName -q 2>$null
+            Remove-GceNetwork -Name $networkName -ErrorAction SilentlyContinue
         }
     }
 
@@ -113,7 +113,7 @@ Describe "New-GceNetwork" {
                 Should Throw "already exists"
         }
         finally {
-            gcloud compute networks delete $networkName -q 2>$null
+            Remove-GceNetwork -Name $networkName -ErrorAction SilentlyContinue
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -86,7 +86,7 @@ Describe "Add-GceInstanceTemplate" {
         try {
             # Create a network and extract out subnet that corresponds to region "us-central1".
             $newNetwork = "test-network-$r"
-            gcloud compute networks create $newNetwork 2>$null
+            New-GceNetwork -Name $newNetwork | Out-Null
             $region = "us-central1"
             $zone = "us-central1-a"
             $network = Get-GceNetwork $newNetwork
@@ -100,7 +100,7 @@ Describe "Add-GceInstanceTemplate" {
             $template.Properties.NetworkInterfaces.Subnetwork | Should Match $subnetName
         }
         finally {
-            gcloud compute networks delete $newNetwork -q 2>$null
+            Remove-GceNetwork -Name $newNetwork -ErrorAction SilentlyContinue
         }
     }
 

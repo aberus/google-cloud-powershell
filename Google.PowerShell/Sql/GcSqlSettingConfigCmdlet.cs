@@ -68,6 +68,21 @@ namespace Google.PowerShell.Sql
         [Parameter]
         public ActivationPolicy Policy { get; set; } = ActivationPolicy.ALWAYS;
 
+        public enum ReplicationTypeConfig
+        {
+            SYNCHRONOUS,
+            ASYNCHRONOUS
+        }
+
+        /// <summary>
+        /// <para type="description">
+        /// The type of replication this instance uses. This can be either ASYNCHRONOUS or SYNCHRONOUS.
+        /// Defaults to SYNCHRONOUS.
+        /// </para>
+        /// </summary>
+        [Parameter]
+        public ReplicationTypeConfig ReplicationType { get; set; } = ReplicationTypeConfig.SYNCHRONOUS;
+
         /// <summary>
         /// <para type="description">
         /// Whether binary log is enabled.
@@ -235,7 +250,7 @@ namespace Google.PowerShell.Sql
                 },
                 StorageAutoResize = StorageAutoResize,
                 DataDiskType = DiskType.ToString(),
-                ReplicationType = "SYNCHRONOUS"
+                ReplicationType = ReplicationType.ToString()
             };
             WriteObject(settings);
         }

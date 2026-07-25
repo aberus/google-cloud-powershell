@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -22,17 +22,17 @@ Describe "Get-GceForwardingRule"{
 
     Context "with data" {
         BeforeAll {
-            gcloud compute http-health-checks create "health-check-$r" 2>$null
-            gcloud compute backend-services create "backend-$r" --http-health-checks "health-check-$r" --global 2>$null
-            gcloud compute url-maps create "url-map-$r" --default-service "backend-$r" 2>$null
-            gcloud compute target-http-proxies create "proxy-$r" --url-map "url-map-$r" 2>$null
-            gcloud compute forwarding-rules create $globalRuleName --target-http-proxy "proxy-$r" --global --ports 8080 2>$null
+            Add-GceHealthCheck "health-check-$r" | Out-Null
+            Add-GceBackendService "backend-$r" -HttpHealthCheck "health-check-$r" | Out-Null
+            Add-GceUrlMap "url-map-$r" -DefaultService "backend-$r" | Out-Null
+            Add-GceTargetProxy "proxy-$r" -UrlMap "url-map-$r" | Out-Null
+            Add-GceForwardingRule $globalRuleName -Global -TargetHttpProxy "proxy-$r" -PortRange 8080 | Out-Null
 
-            gcloud compute target-pools create "pool-$r" --region us-central1 2>$null
-            gcloud compute forwarding-rules create $regionRuleName1 --target-pool "pool-$r" --region us-central1 2>$null
+            Add-GceTargetPool "pool-$r" -Region us-central1 | Out-Null
+            Add-GceForwardingRule $regionRuleName1 -Region us-central1 -TargetPool "pool-$r" | Out-Null
 
-            gcloud compute target-pools create "pool-$r" --region asia-east1 2>$null
-            gcloud compute forwarding-rules create $regionRuleName2 --target-pool "pool-$r" --region asia-east1 2>$null
+            Add-GceTargetPool "pool-$r" -Region asia-east1 | Out-Null
+            Add-GceForwardingRule $regionRuleName2 -Region asia-east1 -TargetPool "pool-$r" | Out-Null
         }
 
         It "should get all rules" {
@@ -70,17 +70,17 @@ Describe "Get-GceForwardingRule"{
         }
 
         AfterAll {
-            gcloud compute forwarding-rules delete $regionRuleName1 --region us-central1 -q 2>$null
-            gcloud compute target-pools delete "pool-$r" -q 2>$null
+            Remove-GceForwardingRule $regionRuleName1 -Region us-central1 -ErrorAction SilentlyContinue
+            Remove-GceTargetPool "pool-$r" -ErrorAction SilentlyContinue
 
-            gcloud compute forwarding-rules delete $regionRuleName2 --region asia-east1 -q 2>$null
-            gcloud compute target-pools delete "pool-$r" --region asia-east1 -q 2>$null
+            Remove-GceForwardingRule $regionRuleName2 -Region asia-east1 -ErrorAction SilentlyContinue
+            Remove-GceTargetPool "pool-$r" -Region asia-east1 -ErrorAction SilentlyContinue
 
-            gcloud compute forwarding-rules delete $globalRuleName --global -q 2>$null
-            gcloud compute target-http-proxies delete "proxy-$r" -q 2>$null
-            gcloud compute url-maps delete "url-map-$r" -q 2>$null
-            gcloud compute backend-services delete "backend-$r" --global -q 2>$null
-            gcloud compute http-health-checks delete "health-check-$r" -q 2>$null
+            Remove-GceForwardingRule $globalRuleName -Global -ErrorAction SilentlyContinue
+            Remove-GceTargetProxy "proxy-$r" -ErrorAction SilentlyContinue
+            Remove-GceUrlMap "url-map-$r" -ErrorAction SilentlyContinue
+            Remove-GceBackendService "backend-$r" -ErrorAction SilentlyContinue
+            Remove-GceHealthCheck "health-check-$r" -Http -ErrorAction SilentlyContinue
         }
     }
 }

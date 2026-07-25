@@ -195,7 +195,7 @@ namespace Google.PowerShell.PubSub
                 Data = receivedMessage.Message.Data;
                 ETag = receivedMessage.Message.ETag;
                 MessageId = receivedMessage.Message.MessageId;
-                PublishTime = receivedMessage.Message.PublishTime;
+                PublishTimeDateTimeOffset = receivedMessage.Message.PublishTimeDateTimeOffset;
             }
         }
 

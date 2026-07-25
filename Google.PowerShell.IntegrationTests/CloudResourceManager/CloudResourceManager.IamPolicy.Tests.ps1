@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -47,8 +47,7 @@ Describe "Add-GcIamPolicyBinding" {
             Test-Binding $member $role $gcloudPowerShellProject2 | Should Be $true
         }
         finally {
-            gcloud projects remove-iam-policy-binding $gcloudPowerShellProject2 `
-                                                      --member="user:$user" --role="$role" 2>$null
+            Remove-GcIamPolicyBinding -Project $gcloudPowerShellProject2 -User $user -Role $role -ErrorAction SilentlyContinue
         }
     }
 
@@ -62,8 +61,7 @@ Describe "Add-GcIamPolicyBinding" {
             Test-Binding $member $role $gcloudPowerShellProject2 | Should Be $true
         }
         finally {
-            gcloud projects remove-iam-policy-binding $gcloudPowerShellProject2 `
-                                                      --member="group:$group" --role="$role" 2>$null
+            Remove-GcIamPolicyBinding -Project $gcloudPowerShellProject2 -Group $group -Role $role -ErrorAction SilentlyContinue
         }
     }
 
@@ -77,8 +75,7 @@ Describe "Add-GcIamPolicyBinding" {
             Test-Binding $member $role $gcloudPowerShellProject2 | Should Be $true
         }
         finally {
-            gcloud projects remove-iam-policy-binding $gcloudPowerShellProject2 `
-                                                      --member="serviceAccount:$appveyorServiceAccEmail" --role="$role" 2>$null
+            Remove-GcIamPolicyBinding -Project $gcloudPowerShellProject2 -ServiceAccount $appveyorServiceAccEmail -Role $role -ErrorAction SilentlyContinue
         }
     }
 
@@ -93,8 +90,7 @@ Describe "Add-GcIamPolicyBinding" {
             Test-Binding $member $role $gcloudPowerShellProject2 | Should Be $true
         }
         finally {
-            gcloud projects remove-iam-policy-binding $gcloudPowerShellProject2 `
-                                                      --member="domain:$domain" --role="$role" 2>$null
+            Remove-GcIamPolicyBinding -Project $gcloudPowerShellProject2 -Domain $domain -Role $role -ErrorAction SilentlyContinue
         }
     }
 
@@ -114,10 +110,8 @@ Describe "Add-GcIamPolicyBinding" {
             Test-Binding $memberTwo $role $gcloudPowerShellProject2 | Should Be $true
         }
         finally {
-            gcloud projects remove-iam-policy-binding $gcloudPowerShellProject2 `
-                                                      --member="user:$user" --role="$role" 2>$null
-            gcloud projects remove-iam-policy-binding $gcloudPowerShellProject2 `
-                                                      --member="group:$group" --role="$role" 2>$null
+            Remove-GcIamPolicyBinding -Project $gcloudPowerShellProject2 -User $user -Role $role -ErrorAction SilentlyContinue
+            Remove-GcIamPolicyBinding -Project $gcloudPowerShellProject2 -Group $group -Role $role -ErrorAction SilentlyContinue
         }
     }
 

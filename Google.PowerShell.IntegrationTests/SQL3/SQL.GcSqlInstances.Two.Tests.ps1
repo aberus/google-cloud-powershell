@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 $project, $_, $oldActiveConfig, $configName = Set-GCloudConfig
 
@@ -22,7 +22,7 @@ Describe "Restart-GcSqlInstance" {
             $operations[1].OperationType | Should Match "CREATE"
         }
         finally {
-            gcloud sql instances delete $instance --quiet 2>$null
+            Remove-GcSqlInstance -Instance $instance -ErrorAction SilentlyContinue
         }
     }
 
@@ -42,7 +42,7 @@ Describe "Restart-GcSqlInstance" {
             $operations[1].OperationType | Should Match "CREATE"
         }
         finally {
-            gcloud sql instances delete $instance --quiet 2>$null
+            Remove-GcSqlInstance -Instance $instance -ErrorAction SilentlyContinue
         }
      }
 
@@ -69,7 +69,7 @@ Describe "Restart-GcSqlInstance" {
             $operations[1].OperationType | Should Match "CREATE"
         }
         finally {
-            gcloud sql instances delete $instance --project $defaultProject --quiet 2>$null
+            Remove-GcSqlInstance -Instance $instance -Project $defaultProject -ErrorAction SilentlyContinue
 
             # Reset gcloud config back to default project (gcloud-powershell-testing)
             gcloud config set project $defaultProject 2>$null
@@ -88,7 +88,7 @@ Describe "ConvertTo-GcSqlInstance" {
         $r = Get-Random
         $replica = "test-repl$r"
         try {
-            gcloud sql instances create $replica --master-instance-name $masterInstance --tier $2ndGenTier --replication SYNCHRONOUS --quiet 2>$null
+            New-GcSqlSettingConfig $2ndGenTier -ReplicationType SYNCHRONOUS | New-GcSqlInstanceConfig $replica -MasterInstanceName $masterInstance | Add-GcSqlInstance | Out-Null
             ConvertTo-GcSqlInstance $replica
 
             $operations = Get-GcSqlOperation -Instance $replica
@@ -99,7 +99,7 @@ Describe "ConvertTo-GcSqlInstance" {
             $operations[1].OperationType | Should Match "CREATE_REPLICA"
         }
         finally {
-            gcloud sql instances delete $replica --quiet 2>$null
+            Remove-GcSqlInstance -Instance $replica -ErrorAction SilentlyContinue
         }
     }
 
@@ -108,7 +108,7 @@ Describe "ConvertTo-GcSqlInstance" {
         $r = Get-Random
         $replica = "test-repl$r"
         try {
-            gcloud sql instances create $replica --master-instance-name $masterInstance --tier $2ndGenTier --replication SYNCHRONOUS --quiet 2>$null
+            New-GcSqlSettingConfig $2ndGenTier -ReplicationType SYNCHRONOUS | New-GcSqlInstanceConfig $replica -MasterInstanceName $masterInstance | Add-GcSqlInstance | Out-Null
             Get-GcSqlInstance -Name $replica | ConvertTo-GcSqlInstance
 
             $operations = Get-GcSqlOperation -Instance $replica
@@ -119,7 +119,7 @@ Describe "ConvertTo-GcSqlInstance" {
             $operations[1].OperationType | Should Match "CREATE_REPLICA"
         }
         finally {
-            gcloud sql instances delete $replica --quiet 2>$null
+            Remove-GcSqlInstance -Instance $replica -ErrorAction SilentlyContinue
         }
      }
 
@@ -134,7 +134,7 @@ Describe "ConvertTo-GcSqlInstance" {
             # Set gcloud config to a non-default project (not gcloud-powershell-testing)
             gcloud config set project $nonDefaultProject 2>$null
 
-            gcloud sql instances create $replica --master-instance-name $masterInstance --tier $2ndGenTier --replication SYNCHRONOUS --project $defaultProject --quiet 2>$null
+            New-GcSqlSettingConfig $2ndGenTier -ReplicationType SYNCHRONOUS | New-GcSqlInstanceConfig $replica -MasterInstanceName $masterInstance | Add-GcSqlInstance -Project $defaultProject | Out-Null
             Get-GcSqlInstance -Project $defaultProject -Name $replica | ConvertTo-GcSqlInstance
 
             $operations = Get-GcSqlOperation -Project $defaultProject -Instance $replica
@@ -145,7 +145,7 @@ Describe "ConvertTo-GcSqlInstance" {
             $operations[1].OperationType | Should Match "CREATE_REPLICA"
         }
         finally {
-            gcloud sql instances delete $replica --project $defaultProject --quiet 2>$null
+            Remove-GcSqlInstance -Instance $replica -Project $defaultProject -ErrorAction SilentlyContinue
 
             # Reset gcloud config back to default project (gcloud-powershell-testing)
             gcloud config set project $defaultProject 2>$null
@@ -238,11 +238,11 @@ Describe "Update-GcSqlInstance" {
         $r = Get-Random
         $script:instance = "test-inst$r"
 
-        gcloud sql instances create $instance --tier "db-n1-standard-1" --activation-policy "ALWAYS" --quiet 2>$null
+        New-GcSqlSettingConfig "db-n1-standard-1" -Policy ALWAYS | New-GcSqlInstanceConfig $instance | Add-GcSqlInstance -ErrorAction SilentlyContinue | Out-Null
     }
   
     AfterAll {
-        gcloud sql instances delete $script:instance --quiet 2>$null
+        Remove-GcSqlInstance -Instance $script:instance -ErrorAction SilentlyContinue
     }
 
     It "should patch even if nothing changes" {

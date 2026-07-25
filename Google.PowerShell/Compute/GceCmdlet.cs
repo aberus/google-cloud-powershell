@@ -256,6 +256,33 @@ namespace Google.PowerShell.Compute
 
             return networkName;
         }
+
+        /// <summary>
+        /// Builds a fully-qualified URI for a global Compute resource from a resource name. This mirrors how
+        /// gcloud resolves short names (e.g. "my-health-check") into the self-link the API expects. If the name
+        /// is already an absolute URI (such as a resource's SelfLink), it is returned unchanged.
+        /// </summary>
+        public static string BuildGlobalResourceUri(string project, string collection, string name)
+        {
+            if (string.IsNullOrEmpty(name) || Uri.IsWellFormedUriString(name, UriKind.Absolute))
+            {
+                return name;
+            }
+            return $"https://www.googleapis.com/compute/v1/projects/{project}/global/{collection}/{name}";
+        }
+
+        /// <summary>
+        /// Builds a fully-qualified URI for a regional Compute resource from a resource name. If the name is
+        /// already an absolute URI, it is returned unchanged.
+        /// </summary>
+        public static string BuildRegionResourceUri(string project, string region, string collection, string name)
+        {
+            if (string.IsNullOrEmpty(name) || Uri.IsWellFormedUriString(name, UriKind.Absolute))
+            {
+                return name;
+            }
+            return $"https://www.googleapis.com/compute/v1/projects/{project}/regions/{region}/{collection}/{name}";
+        }
     }
 
     /// <summary>

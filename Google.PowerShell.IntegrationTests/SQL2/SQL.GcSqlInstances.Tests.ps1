@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 $project, $_, $oldActiveConfig, $configName = Set-GCloudConfig
 
@@ -169,7 +169,7 @@ Describe "Remove-GcSqlInstance" {
 
 Describe "Export-GcSqlInstance" {
     AfterAll {
-        gsutil -q rm gs://gcsql-instance-testing/*
+        Get-GcsObject -Bucket "gcsql-instance-testing" | Remove-GcsObject -ErrorAction SilentlyContinue
     }
 
     # For these tests, test-db4 was used because an instance must have a populated database for it to work.
@@ -181,35 +181,35 @@ Describe "Export-GcSqlInstance" {
 
 
     It "should export an applicable SQL file" {
-        $beforeObjects = gsutil ls gs://gcsql-instance-testing
-        ($beforeObjects -contains "gs://gcsql-instance-testing/testsql$r.gz") | Should Be false
+        $beforeObjects = (Get-GcsObject -Bucket "gcsql-instance-testing").Name
+        ($beforeObjects -contains "testsql$r.gz") | Should Be false
         Export-GcSqlInstance $instance "gs://gcsql-instance-testing/testsql$r.gz"
-        $afterObjects = gsutil ls gs://gcsql-instance-testing
-        ($afterObjects -contains "gs://gcsql-instance-testing/testsql$r.gz") | Should Be true
+        $afterObjects = (Get-GcsObject -Bucket "gcsql-instance-testing").Name
+        ($afterObjects -contains "testsql$r.gz") | Should Be true
     }
 
     It "should export an applicable CSV file" {
-        $beforeObjects = gsutil ls gs://gcsql-instance-testing
-        ($beforeObjects -contains "gs://gcsql-instance-testing/testcsv$r.csv") | Should Be false
+        $beforeObjects = (Get-GcsObject -Bucket "gcsql-instance-testing").Name
+        ($beforeObjects -contains "testcsv$r.csv") | Should Be false
         Export-GcSqlInstance $instance "gs://gcsql-instance-testing/testcsv$r.csv" "SELECT * FROM guestbook.entries"
-        $afterObjects = gsutil ls gs://gcsql-instance-testing
-        ($afterObjects -contains "gs://gcsql-instance-testing/testcsv$r.csv") | Should Be true
+        $afterObjects = (Get-GcsObject -Bucket "gcsql-instance-testing").Name
+        ($afterObjects -contains "testcsv$r.csv") | Should Be true
     }
 
     It "should be able to export a specific SQL file" {
-        $beforeObjects = gsutil ls gs://gcsql-instance-testing
-        ($beforeObjects -contains "gs://gcsql-instance-testing/testothersql$r.gz") | Should Be false
+        $beforeObjects = (Get-GcsObject -Bucket "gcsql-instance-testing").Name
+        ($beforeObjects -contains "testothersql$r.gz") | Should Be false
         Export-GcSqlInstance $instance "gs://gcsql-instance-testing/testothersql$r.gz" -Database "guestbook","guestbook2" 
-        $afterObjects = gsutil ls gs://gcsql-instance-testing
-        ($afterObjects -contains "gs://gcsql-instance-testing/testothersql$r.gz") | Should Be true
+        $afterObjects = (Get-GcsObject -Bucket "gcsql-instance-testing").Name
+        ($afterObjects -contains "testothersql$r.gz") | Should Be true
     }
 
     It "should be able to export a specific CSV file" {
-        $beforeObjects = gsutil ls gs://gcsql-instance-testing
-        ($beforeObjects -contains "gs://gcsql-instance-testing/testothercsv$r.csv") | Should Be false
+        $beforeObjects = (Get-GcsObject -Bucket "gcsql-instance-testing").Name
+        ($beforeObjects -contains "testothercsv$r.csv") | Should Be false
         Export-GcSqlInstance $instance "gs://gcsql-instance-testing/testothercsv$r.csv" -Database "guestbook" "SELECT * FROM entries"
-        $afterObjects = gsutil ls gs://gcsql-instance-testing
-        ($afterObjects -contains "gs://gcsql-instance-testing/testothercsv$r.csv") | Should Be true
+        $afterObjects = (Get-GcsObject -Bucket "gcsql-instance-testing").Name
+        ($afterObjects -contains "testothercsv$r.csv") | Should Be true
     }
 
 }
@@ -222,7 +222,7 @@ Describe "Import-GcSqlInstance" {
 
     # Ordinarily for these tests to work, you would do something similar to the following:
    
-    # gcloud sql instances create $instance --quiet 2>$null
+    # New-GcSqlSettingConfig | New-GcSqlInstanceConfig $instance | Add-GcSqlInstance
     # $bucket = New-GcsBucket -Name "gcps-bucket-creation" -Project $project
     # Get an SQL or CSV file onto your computer
     # New-GcsObject $bucket $objectName -File $filename
@@ -232,7 +232,7 @@ Describe "Import-GcSqlInstance" {
     # Create the database/tables for your instance using a MySQL client.
     # The tests could now be run with the applicable files/instances.
     # Afterwards,
-    # gcloud sql instances delete $instance --quiet 2>$null
+    # Remove-GcSqlInstance -Instance $instance -ErrorAction SilentlyContinue
     # Remove-GcsBucket $bucketName -Force
 
     # Because importing data into a database can take varying amounts of time, the only way to be sure the operation was

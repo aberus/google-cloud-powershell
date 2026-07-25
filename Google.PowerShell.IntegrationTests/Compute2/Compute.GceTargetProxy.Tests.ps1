@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -23,12 +23,12 @@ Describe "Get-GceTargetPool"{
 
     Context "with data" {
         BeforeAll {
-            gcloud compute http-health-checks create "health-check-$r" 2>$null
-            gcloud compute backend-services create "backend-$r" --http-health-checks "health-check-$r" --global 2>$null
-            gcloud compute url-maps create "url-map-$r" --default-service "backend-$r" 2>$null
-            gcloud compute target-http-proxies create $httpProxyName --url-map "url-map-$r" 2>$null
+            Add-GceHealthCheck "health-check-$r" | Out-Null
+            Add-GceBackendService "backend-$r" -HttpHealthCheck "health-check-$r" | Out-Null
+            Add-GceUrlMap "url-map-$r" -DefaultService "backend-$r" | Out-Null
+            Add-GceTargetProxy $httpProxyName -UrlMap "url-map-$r" | Out-Null
             # TODO(jimwp): Make this a target-https-proxy by creating a self signed certificate.
-            gcloud compute target-http-proxies create $httpsProxyName --url-map "url-map-$r" 2>$null
+            Add-GceTargetProxy $httpsProxyName -UrlMap "url-map-$r" | Out-Null
         }
 
         It "should get all Proxies" {
@@ -58,11 +58,11 @@ Describe "Get-GceTargetPool"{
         }
 
         AfterAll {
-            gcloud compute target-http-proxies delete $httpsProxyName -q 2>$null
-            gcloud compute target-http-proxies delete $httpProxyName -q 2>$null
-            gcloud compute url-maps delete "url-map-$r" -q 2>$null
-            gcloud compute backend-services delete "backend-$r" --global -q 2>$null
-            gcloud compute http-health-checks delete "health-check-$r" -q 2>$null
+            Remove-GceTargetProxy $httpsProxyName -ErrorAction SilentlyContinue
+            Remove-GceTargetProxy $httpProxyName -ErrorAction SilentlyContinue
+            Remove-GceUrlMap "url-map-$r" -ErrorAction SilentlyContinue
+            Remove-GceBackendService "backend-$r" -ErrorAction SilentlyContinue
+            Remove-GceHealthCheck "health-check-$r" -Http -ErrorAction SilentlyContinue
         }
     }
 }

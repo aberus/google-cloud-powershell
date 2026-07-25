@@ -1,4 +1,4 @@
-﻿. $PSScriptRoot\..\GcloudCmdlets.ps1
+. $PSScriptRoot\..\GcloudCmdlets.ps1
 Install-GcloudCmdlets
 
 $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
@@ -109,7 +109,7 @@ Describe "Add-GceFirewall" {
         $firewallName = "test-add-gcefirewall-$r"
 
         try {
-            gcloud compute networks create $newNetwork 2>$null
+            New-GceNetwork -Name $newNetwork | Out-Null
             $firewall = Add-GceFirewall $firewallName -Allowed $allowed -Description "one for test $r" `
                 -SourceTag "alpha" -TargetTag "beta" -Network $newNetwork
 
@@ -123,7 +123,7 @@ Describe "Add-GceFirewall" {
         }
         finally {
             Remove-GceFirewall $firewallName
-            gcloud compute networks delete $newNetwork -q 2>$null
+            Remove-GceNetwork -Name $newNetwork -ErrorAction SilentlyContinue
         }
     }
 }
