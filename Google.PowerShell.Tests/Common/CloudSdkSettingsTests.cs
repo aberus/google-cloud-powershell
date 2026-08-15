@@ -1,6 +1,8 @@
 // Copyright 2015-2016 Google Inc. All Rights Reserved.
 // Licensed under the Apache License Version 2.0.
 
+using System.Collections.Generic;
+
 using NUnit.Framework;
 using Google.PowerShell.Common;
 
@@ -9,32 +11,37 @@ namespace Google.PowerShell.Tests.Common
     [TestFixture]
     public class CloudSdkSettingsTests
     {
-        // Seed a fake active config so settings resolve without invoking gcloud.
         [SetUp]
         public void SetUp()
         {
-            TestSupport.SeedFakeActiveConfig();
+            GCloudPowerShellConfig.InMemoryOverride = new Dictionary<string, string>
+            {
+                { GCloudPowerShellConfig.ProjectKey, "test-project" },
+                { CloudSdkSettings.DisableUsageReportingSetting, "False" },
+            };
         }
 
         [TearDown]
         public void TearDown()
         {
-            TestSupport.ClearActiveConfig();
+            GCloudPowerShellConfig.InMemoryOverride = null;
         }
 
         [Test]
         public void TestGetDefaultProject()
         {
-            Assert.AreEqual(TestSupport.FakeProject, CloudSdkSettings.GetDefaultProject());
+            Assert.AreEqual("test-project", CloudSdkSettings.GetDefaultProject());
         }
 
         [Test]
         public void TestGetOptInSetting()
         {
-            // Just assert these don't throw. GetAnonymousClientID may return a new UUID each time, so we only
-            // check that a value is produced.
-            CloudSdkSettings.GetOptIntoUsageReporting();
-            CloudSdkSettings.GetAnonymousClientID();
+            // disable_usage_reporting is "False", so reporting is opted in.
+            Assert.IsTrue(CloudSdkSettings.GetOptIntoUsageReporting());
+
+            // Just assert this doesn't throw and returns a stable, non-empty client ID.
+            string clientId = CloudSdkSettings.GetAnonymousClientID();
+            Assert.That(clientId, Is.Not.Null.And.Not.Empty);
         }
     }
 }

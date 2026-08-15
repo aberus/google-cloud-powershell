@@ -42,33 +42,36 @@ function Add-TestFile($bucket, $objName) {
     Remove-Item -Force $filename
 }
 
-# Creates a new gcloud configuration and sets it to active. Returns project, zone, oldActiveConfig,
-# and newConfigName.
+# Points the module at the testing project/zone/region and returns the previous configuration so it can
+# be restored afterwards. The return shape (project, zone, oldConfig, reserved) is kept for compatibility
+# with the callers; the fourth value is unused and only preserved so existing test scaffolding keeps working.
 function Set-GCloudConfig(){
     $project = "gcloud-powershell-testing"
     $zone = "us-central1-f"
 
-    # parse the configurations list, creating objects with properties named by the first line of output.
-    $configList = gcloud config configurations list 2>$null
-    $oldActiveConfig = $configList -split [System.Environment]::NewLine |
-         % {$_ -split "\s+" -join ","} | ConvertFrom-Csv | Where {$_.IS_ACTIVE -match "True"}
+    # Capture the current defaults so Reset-GCloudConfig can put them back when the tests finish.
+    $oldConfig = Get-GcpConfig
 
-    $configRandom = Get-Random
-    $configName = "testing$configRandom"
-    gcloud config configurations create $configName 2>$null
-    gcloud config configurations activate $configName 2>$null
-    gcloud config set core/account $oldActiveConfig.ACCOUNT 2>$null
-    gcloud config set core/project $project 2>$null
-    gcloud config set compute/zone $zone 2>$null
-    gcloud config set compute/region us-central1 2>$null
-    
-    return $project, $zone, $oldActiveConfig, $configName
+    Set-GcpConfig -Project $project -Zone $zone -Region "us-central1"
+
+    return $project, $zone, $oldConfig, $null
 }
 
-# Reactivates the old active config and deletes the testing config
+# Restores the module configuration captured by Set-GCloudConfig. The second parameter is unused and kept
+# only for compatibility with existing callers.
 function Reset-GCloudConfig($oldConfig, $configName) {
-    gcloud config configurations activate $oldConfig.NAME 2>$null
-    gcloud config configurations delete $configName -q 2>$null
+    if ($null -eq $oldConfig) {
+        return
+    }
+
+    # Set-GcpConfig rejects null/empty values, so only restore settings that were previously present.
+    $params = @{}
+    if ($oldConfig.Project) { $params["Project"] = $oldConfig.Project }
+    if ($oldConfig.Zone)    { $params["Zone"]    = $oldConfig.Zone }
+    if ($oldConfig.Region)  { $params["Region"]  = $oldConfig.Region }
+    if ($params.Count -gt 0) {
+        Set-GcpConfig @params
+    }
 }
 
 # Installs Cloud SDK non-interactively.

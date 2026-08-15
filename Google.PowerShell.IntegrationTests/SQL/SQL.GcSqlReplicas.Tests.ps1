@@ -52,8 +52,8 @@ Describe "Start-GcSqlReplica" {
         $nonDefaultProject = "asdf"
         $defaultProject = "gcloud-powershell-testing"
 
-        # Set gcloud config to a non-default project (not gcloud-powershell-testing)
-        gcloud config set project $nonDefaultProject 2>$null
+        # Set the default project to a non-default project (not gcloud-powershell-testing)
+        Set-GcpConfig -Project $nonDefaultProject
 
          # A random number is used to avoid collisions with the speed of creating and deleting instances/replicas.
         $r = Get-Random
@@ -72,8 +72,8 @@ Describe "Start-GcSqlReplica" {
         finally {
             Remove-GcSqlInstance -Instance $replica -Project $defaultProject -ErrorAction SilentlyContinue
 
-            # Reset gcloud config back to default project (gcloud-powershell-testing)
-            gcloud config set project $defaultProject 2>$null
+            # Reset the default project back to gcloud-powershell-testing
+            Set-GcpConfig -Project $defaultProject
         }
      }
 }
@@ -128,8 +128,8 @@ Describe "Stop-GcSqlReplica" {
         $nonDefaultProject = "asdf"
         $defaultProject = "gcloud-powershell-testing"
 
-        # Set gcloud config to a non-default project (not gcloud-powershell-testing)
-        gcloud config set project $nonDefaultProject 2>$null
+        # Set the default project to a non-default project (not gcloud-powershell-testing)
+        Set-GcpConfig -Project $nonDefaultProject
 
         try {
              # A random number is used to avoid collisions with the speed of creating and deleting instances/replicas.
@@ -148,8 +148,8 @@ Describe "Stop-GcSqlReplica" {
         finally {
             Remove-GcSqlInstance -Instance $replica -Project $defaultProject -ErrorAction SilentlyContinue
 
-            # Reset gcloud config back to default project (gcloud-powershell-testing)
-            gcloud config set project $defaultProject 2>$null
+            # Reset the default project back to gcloud-powershell-testing
+            Set-GcpConfig -Project $defaultProject
         }
      }
 }

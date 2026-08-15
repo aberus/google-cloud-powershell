@@ -1,17 +1,19 @@
-﻿// Copyright 2015-2016 Google Inc. All Rights Reserved.
+// Copyright 2015-2016 Google Inc. All Rights Reserved.
 // Licensed under the Apache License Version 2.0.
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Google.PowerShell.Common
 {
     /// <summary>
-    /// Wrapper over the settings files created by the Google Cloud SDK. No data is cached, so
-    /// it is possible to have race conditions between gcloud and PowerShell. This is by design.
-    /// gcloud is the source of truth for data.
+    /// Provides the module's default settings (project, zone, region and usage reporting).
+    ///
+    /// Values are read from the module's own configuration store (see <see cref="GCloudPowerShellConfig"/>),
+    /// which is populated by Connect-GcpAccount / Set-GcpConfig. The default project additionally falls back to
+    /// the Google Compute Engine metadata server when the module runs on a VM. This no longer depends on the
+    /// gcloud CLI.
     /// </summary>
     public class CloudSdkSettings
     {
@@ -22,69 +24,57 @@ namespace Google.PowerShell.Common
             public const string Region = "region";
         }
 
-        /// <summary>
-        /// Environment variable which points to the location of the current configuration file.
-        /// This overrides the user configuration file as well as the global installation properties file.
-        /// </summary>
-        private const string CloudSdkConfigVariable = "CLOUDSDK_CONFIG";
+        /// <summary>Setting name that stores whether anonymous usage reporting is disabled.</summary>
+        internal const string DisableUsageReportingSetting = "disable_usage_reporting";
 
-        /// <summary>
-        /// Environment variable which stores the current active config.
-        /// This overrides value found in active_config file if present.
-        /// </summary>
-        private const string CloudSdkActiveConfigNameVariable = "CLOUDSDK_ACTIVE_CONFIG_NAME";
-
-        /// <summary>Environment variable which contains the Application Data settings.</summary>
-        private const string AppdataEnvironmentVariable = "APPDATA";
-
-        /// <summary>
-        /// GCloud configuration directory, relative to %APPDATA% in Windows
-        /// and %HOME%/.config in UNIX.
-        /// </summary>
-        private const string CloudSDKConfigDirectoryWindows = "gcloud";
-
-        /// <summary>Name of the Cloud SDK file containing the name of the active config.</summary>
-        private const string ActiveConfigFileName = "active_config";
-
-        /// <summary>Folder name where configuration files are stored.</summary>
-        private const string ConfigurationsFolderName = "configurations";
-
-        /// <summary>Name of the file containing the anonymous client ID.</summary>
+        /// <summary>Name of the file containing the anonymous client ID used for telemetry grouping.</summary>
         private const string ClientIDFileName = ".metricsUUID";
 
         // Prevent instantiation. Should just be a static utility class.
         private CloudSdkSettings() { }
 
         /// <summary>
-        /// Returns the setting with the given name from the currently active gcloud configuration.
+        /// Returns the value for the given setting, or null if it is not set.
         /// </summary>
         public static string GetSettingsValue(string settingName)
         {
-            //return ActiveUserConfig.GetPropertyValue(settingName).GetAwaiter().GetResult();
-            
-            if (string.Equals(settingName, CommonProperties.Project, StringComparison.CurrentCultureIgnoreCase))
+            string value = GCloudPowerShellConfig.Default.GetSetting(settingName);
+            if (!string.IsNullOrEmpty(value))
             {
-                return GCloudMetadataClient.GetProjectId();
+                return value;
             }
 
-            return "";
+            // When running on a Google Cloud VM, fall back to the metadata server for the default project.
+            if (string.Equals(settingName, CommonProperties.Project, StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    string projectId = GCloudMetadataClient.GetProjectId();
+                    return string.IsNullOrEmpty(projectId) ? null : projectId;
+                }
+                catch
+                {
+                    // Not running on GCE, or the metadata server is unreachable. Fall through to null.
+                }
+            }
+
+            return null;
         }
 
-        /// <summary>Returns the default project for the Google Cloud SDK.</summary>
+        /// <summary>Returns the default project for the module.</summary>
         public static string GetDefaultProject()
         {
             return GetSettingsValue(CommonProperties.Project);
         }
 
         /// <summary>
-        /// Returns whether or not the user has opted-into of telemetry reporting. Defaults to false (opted-out).
+        /// Returns whether or not the user has opted into telemetry reporting.
         /// </summary>
         public static bool GetOptIntoUsageReporting()
         {
-            string rawValue = GetSettingsValue("disable_usage_reporting");
+            string rawValue = GetSettingsValue(DisableUsageReportingSetting);
             bool value = false;
-            // If the disable_usage_reporting value is not set, fall back to the install default.
-            // (false, meaning to report usage.)
+            // If the disable_usage_reporting value is not set, fall back to the default (report usage).
             if (rawValue == null || Boolean.TryParse(rawValue, out value))
             {
                 // Invert the value, because the value stores whether it is *disabled*.
@@ -97,31 +87,29 @@ namespace Google.PowerShell.Common
         }
 
         /// <summary>
-        /// Client ID refers to the random UUID generated to group telemetry reporting.
-        ///
-        /// The file is generated on-demand by the Python code. Returns a new UUID if
-        /// the file isn't found. (Meaning we will generate new UUIDs until the Python
-        /// code gets executed.)
+        /// Client ID refers to the random UUID generated to group telemetry reporting. The value is persisted
+        /// under the module's configuration directory so that it remains stable across sessions.
         /// </summary>
         public static string GetAnonymousClientID()
         {
-            string cloudSdkFolder = GetCloudSdkFolder();
-
-            if (cloudSdkFolder == null || !Directory.Exists(cloudSdkFolder))
+            try
             {
-                return null;
+                string uuidFile = Path.Combine(GCloudPowerShellConfig.ConfigDirectory, ClientIDFileName);
+                if (File.Exists(uuidFile))
+                {
+                    return File.ReadAllText(uuidFile);
+                }
+
+                string uuid = Guid.NewGuid().ToString();
+                Directory.CreateDirectory(GCloudPowerShellConfig.ConfigDirectory);
+                File.WriteAllText(uuidFile, uuid);
+                return uuid;
             }
-
-            string uuidFile = Path.Combine(
-                cloudSdkFolder,
-                CloudSDKConfigDirectoryWindows,
-                ClientIDFileName);
-
-            if (!File.Exists(uuidFile))
+            catch
             {
+                // If we cannot persist the ID, still return a value so telemetry can proceed.
                 return Guid.NewGuid().ToString();
             }
-            return File.ReadAllText(uuidFile);
         }
 
         /// <summary>
@@ -147,19 +135,6 @@ namespace Google.PowerShell.Common
 
                 return s_isWindows.Value;
             }
-        }
-
-        /// <summary>
-        /// Returns the folder that contains Cloud SDK Config.
-        /// </summary>
-        private static string GetCloudSdkFolder()
-        {
-            if (IsWindows)
-            {
-                return Environment.GetEnvironmentVariable(AppdataEnvironmentVariable);
-            }
-
-            return Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".config");
         }
     }
 }

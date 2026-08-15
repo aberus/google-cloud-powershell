@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Google.Apis.Compute.v1;
 using Google.PowerShell.Common;
 using NUnit.Framework;
 using System;
-using System.Collections.ObjectModel;
-using System.IO;
+using System.Collections.Generic;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 
@@ -32,29 +30,6 @@ namespace Google.PowerShell.Tests.Common
         protected const string FakeRegionName = "fake-region";
         protected const string FakeZoneName = "fake-zone";
         protected const string FakeProjectId = "fake-project";
-        private static readonly string s_fakeConfigJson = $@"{{
-            'configuration': {{
-                'active_configuration': 'testing',
-                'properties': {{
-                    'compute': {{
-                        'region': '{FakeRegionName}',
-                        'zone': '{FakeZoneName}'
-                    }},
-                    'core': {{
-                        'account': 'testing@google.com',
-                        'disable_usage_reporting': 'False',
-                        'project': '{FakeProjectId}'
-                    }}
-                }}
-            }},
-            'credential': {{
-                'access_token': 'fake-token',
-                'token_expiry': '2012-12-12T12:12:12Z'
-            }},
-            'sentinels': {{
-                'config_sentinel': 'sentinel.sentinel'
-            }}
-        }}";
 
         //protected readonly RunspaceConfiguration Config = RunspaceConfiguration.Create();
         protected readonly InitialSessionState Config = InitialSessionState.Create();
@@ -64,7 +39,16 @@ namespace Google.PowerShell.Tests.Common
         [SetUp]
         public void BeforeEach()
         {
-            ActiveUserConfig.ActiveConfig = new ActiveUserConfig(s_fakeConfigJson);
+            // Seed the module's settings with fake defaults so cmdlets resolve a project/zone/region without
+            // touching disk or the network.
+            GCloudPowerShellConfig.InMemoryOverride = new Dictionary<string, string>
+            {
+                { GCloudPowerShellConfig.ProjectKey, FakeProjectId },
+                { GCloudPowerShellConfig.ZoneKey, FakeZoneName },
+                { GCloudPowerShellConfig.RegionKey, FakeRegionName },
+                { GCloudPowerShellConfig.AccountKey, "testing@google.com" },
+                { CloudSdkSettings.DisableUsageReportingSetting, "False" },
+            };
             //Runspace rs = RunspaceFactory.CreateRunspace(Config);
             //rs.Open();
             //Pipeline = rs.CreatePipeline();
@@ -81,13 +65,14 @@ namespace Google.PowerShell.Tests.Common
             //PowerShellInstance.AddScript($"cd {repoToolsPath}\\ModuleMetadata");
             //PowerShellInstance.AddScript($"Import-Module {repoToolsPath}\\ModuleMetadata\\GetModuleMetadata.psm1");
             PowerShellInstance.AddScript($"Import-Module \"{AppDomain.CurrentDomain.BaseDirectory}\\Google.PowerShell.dll\"");
-      PowerShellInstance.AddScript("$ErrorActionPreference='Stop'");
-      PowerShellInstance.Invoke();
-    }
+            PowerShellInstance.AddScript("$ErrorActionPreference='Stop'");
+            PowerShellInstance.Invoke();
+        }
 
         [TearDown]
         public void AfterEach()
         {
+            GCloudPowerShellConfig.InMemoryOverride = null;
             PowerShellInstance.Dispose();
             PowerShellInstance.Runspace.Dispose();
         }

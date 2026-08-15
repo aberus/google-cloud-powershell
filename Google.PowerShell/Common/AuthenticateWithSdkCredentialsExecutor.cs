@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright 2015-2016 Google Inc. All Rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 using Google.Apis.Auth.OAuth2;
-using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.Http;
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -26,37 +24,23 @@ namespace Google.PowerShell.Common
 {
     /// <summary>
     /// OAuth 2.0 credential for accessing protected resources using an access token.
-    /// This class will get the access token from "gcloud auth print-access-token".
+    /// This delegates to the user credential obtained through <see cref="GoogleCloudCredential"/> (an
+    /// interactive browser login persisted on disk), so no dependency on the gcloud CLI is required. The
+    /// underlying <see cref="UserCredential"/> transparently refreshes the access token from the stored
+    /// refresh token.
     /// </summary>
     public class AuthenticateWithSdkCredentialsExecutor : ICredential, IHttpExecuteInterceptor, IHttpUnsuccessfulResponseHandler
     {
-        /// <summary>
-        /// Returns the authorization code flow. 
-        /// This is used to revoke token (in RevokeTokenAsync)
-        /// and intercept request with the access token (in InterceptAsync).
-        /// </summary>
-        private IAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow(
-            new GoogleAuthorizationCodeFlow.Initializer()
-            {
-                ClientSecrets = new ClientSecrets()
-                {
-                    ClientId = "clientId",
-                    ClientSecret = "clientSecrets"
-                }
-            });
-
         #region IHttpExecuteInterceptor
 
         /// <summary>
-        /// Default implementation is to try to refresh the access token if there is no access token or if we are 1 
-        /// minute away from expiration. If token server is unavailable, it will try to use the access token even if 
-        /// has expired. If successful, it will call <see cref="IAccessMethod.Intercept"/>.
+        /// Adds the access token to the outgoing request, obtaining (and refreshing) it from the stored user
+        /// credential as needed.
         /// </summary>
         public async Task InterceptAsync(HttpRequestMessage request, CancellationToken taskCancellationToken)
         {
-            Task<string> getAccessTokenTask = GetAccessTokenForRequestAsync(request.RequestUri.ToString(), taskCancellationToken);
-            string accessToken = await getAccessTokenTask.ConfigureAwait(false);
-            flow.AccessMethod.Intercept(request, accessToken);
+            UserCredential credential = await GoogleCloudCredential.GetActiveUserCredentialAsync(taskCancellationToken).ConfigureAwait(false);
+            await credential.InterceptAsync(request, taskCancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -64,18 +48,18 @@ namespace Google.PowerShell.Common
         #region IHttpUnsuccessfulResponseHandler
 
         /// <summary>
-        /// Handles an abnormal response when sending a HTTP request.
-        /// A simple rule must be followed, if you modify the request object in a way that the abnormal response can
-        /// be resolved, you must return <c>true</c>.
+        /// Handles an abnormal response when sending a HTTP request. On a 401 it refreshes the token via the
+        /// underlying user credential and signals the request should be retried.
         /// </summary>
         public async Task<bool> HandleResponseAsync(HandleUnsuccessfulResponseArgs args)
         {
-            if (args.Response.StatusCode == HttpStatusCode.Unauthorized)
+            if (args.Response.StatusCode != HttpStatusCode.Unauthorized)
             {
-                return await RefreshTokenAsync(args.CancellationToken).ConfigureAwait(false);
+                return false;
             }
 
-            return false;
+            UserCredential credential = await GoogleCloudCredential.GetActiveUserCredentialAsync(args.CancellationToken).ConfigureAwait(false);
+            return await credential.HandleResponseAsync(args).ConfigureAwait(false);
         }
 
         #endregion
@@ -92,39 +76,32 @@ namespace Google.PowerShell.Common
 
         #region ITokenAccess implementation
 
-        public virtual async Task<string> GetAccessTokenForRequestAsync(string authUri = null, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<string> GetAccessTokenForRequestAsync(string authUri = null, CancellationToken cancellationToken = default)
         {
-            TokenResponse token = await ActiveUserConfig.GetActiveUserToken(cancellationToken);
-            return token.AccessToken;
+            UserCredential credential =
+                await GoogleCloudCredential.GetActiveUserCredentialAsync(cancellationToken).ConfigureAwait(false);
+            return await credential.GetAccessTokenForRequestAsync(authUri, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
 
         /// <summary>
-        /// Refreshes the token by calling to ActiveUserConfig.GetActiveUserToken
+        /// Refreshes the access token using the stored user credential.
         /// </summary>
         public async Task<bool> RefreshTokenAsync(CancellationToken taskCancellationToken)
         {
-            TokenResponse userToken = await ActiveUserConfig.GetActiveUserToken(taskCancellationToken, refresh: true);
-            if (userToken != null && userToken.AccessToken != null)
-            {
-                return true;
-            }
-            return false;
+            UserCredential credential = await GoogleCloudCredential.GetActiveUserCredentialAsync(taskCancellationToken).ConfigureAwait(false);
+            return await credential.RefreshTokenAsync(taskCancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Asynchronously revokes the token by calling
-        /// <see cref="Google.Apis.Auth.OAuth2.Flows.IAuthorizationCodeFlow.RevokeTokenAsync"/>.
+        /// Revokes the stored user credential.
         /// </summary>
         /// <param name="taskCancellationToken">Cancellation token to cancel an operation.</param>
         /// <returns><c>true</c> if the token was revoked successfully.</returns>
         public async Task<bool> RevokeTokenAsync(CancellationToken taskCancellationToken)
         {
-            TokenResponse userToken = await ActiveUserConfig.GetActiveUserToken(taskCancellationToken);
-
-            await flow.RevokeTokenAsync("userId", userToken.AccessToken, taskCancellationToken).ConfigureAwait(false);
-            // We don't set the token to null, cause we want that the next request (without reauthorizing) will fail).
+            await GoogleCloudCredential.RevokeAsync(taskCancellationToken).ConfigureAwait(false);
             return true;
         }
     }

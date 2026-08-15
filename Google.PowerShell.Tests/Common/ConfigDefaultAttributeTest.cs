@@ -3,6 +3,7 @@
 
 using Google.PowerShell.Common;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.Management.Automation;
 
 namespace Google.PowerShell.Tests.Common
@@ -10,17 +11,21 @@ namespace Google.PowerShell.Tests.Common
     [TestFixture]
     public class ConfigDefaultAttributeTest
     {
-        // Seed a fake active config so the default project resolves without invoking gcloud.
         [SetUp]
         public void SetUp()
         {
-            TestSupport.SeedFakeActiveConfig();
+            // Seed a default project so the "config default works" path is deterministic, while leaving
+            // unknown properties unset so the "not found" path still throws.
+            GCloudPowerShellConfig.InMemoryOverride = new Dictionary<string, string>
+            {
+                { GCloudPowerShellConfig.ProjectKey, "test-default-project" },
+            };
         }
 
         [TearDown]
         public void TearDown()
         {
-            TestSupport.ClearActiveConfig();
+            GCloudPowerShellConfig.InMemoryOverride = null;
         }
 
         internal class TestGCloudCmdlet : GCloudCmdlet
@@ -62,4 +67,4 @@ namespace Google.PowerShell.Tests.Common
             Assert.Throws<PSInvalidOperationException>(cmdlet.TestBeginProcessing);
         }
     }
-}
+}

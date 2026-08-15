@@ -39,31 +39,27 @@ Describe "Get-GcsBucket" {
         Remove-GcsBucket -Name gcps-testbucket -ErrorAction SilentlyContinue
     }
 
-    It "should take into account changes in the Cloud SDK, including environment variables" -Skip:$skipServiceAccountTest {
+    It "should authenticate as a service account and honor Set-GcpConfig" -Skip:$skipServiceAccountTest {
         if ($null -eq $additionalKey -or (-not (Test-Path $additionalKey))) {
             throw "Cannot find service account credential for project '$additionalTestingProject'"
         }
 
         try {
-            gcloud auth activate-service-account --key-file="$additionalKey" 2>$null
-            # Should throw 403 because the project is still "gcloud-powershell-testing"
+            # Authenticate as the service account. It can access $additionalTestingProject but not the default
+            # project, so listing buckets in the default project should be forbidden.
+            Connect-GcpAccount -ServiceAccountKeyFile $additionalKey
+            Set-GcpConfig -Project $project
             { Get-GcsBucket } | Should Throw "403"
-            # This will set the project to quoct-test-project
-            $env:CLOUDSDK_CORE_PROJECT = $additionalTestingProject
+
+            # Point the module at the project the service account can access.
+            Set-GcpConfig -Project $additionalTestingProject
             $bucket = Get-GcsBucket $bucketInOtherTestProject
             $bucket.Name | Should Match $bucketInOtherTestProject
-
-            # Now we change the project back
-            $env:CLOUDSDK_CORE_PROJECT = $null
-            gcloud config set account $serviceAccountInOtherTestProject 2>$null
-            $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
-            { Get-GcsBucket $bucketInOtherTestProject } | Should Throw "403"
         }
         finally {
-            # If this is true then the test did not call Set-GCloudConfig.
-            if ($project -eq $additionalTestingProject) {
-                $project, $zone, $oldActiveConfig, $configName = Set-GCloudConfig
-            }
+            # Restore the suite's default credentials and project.
+            Disconnect-GcpAccount -ErrorAction SilentlyContinue
+            Set-GcpConfig -Project $project
         }
     }
 

@@ -12,10 +12,10 @@
 RootModule = 'GoogleCloud.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.1.10'
+ModuleVersion = '1.1.0.0'
 
 # Supported PSEditions
-# CompatiblePSEditions = @()
+CompatiblePSEditions = @('Core', 'Desktop')
 
 # ID used to uniquely identify this module
 GUID = 'e74637e6-7a4e-422d-bb9c-ca50809d78bb'
@@ -33,7 +33,7 @@ Copyright = 'Google Inc. All rights reserved.'
 Description = 'PowerShell cmdlets for the Google Cloud Platform.'
 
 # Minimum version of the Windows PowerShell engine required by this module
-PowerShellVersion = '3.0'
+PowerShellVersion = '5.1'
 
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
@@ -116,7 +116,9 @@ The module also contains a PowerShell provider for Google Cloud Storage. This pr
 you to use commands like ''cd'', ''dir'', ''copy'' and ''del'' to navigate and manipulate your data
 in Cloud Storage as if the data were on a local file system.
 
-The module requires Google Cloud SDK to work.'
+The module authenticates natively: run ''Connect-GcpAccount'' to sign in, or set the
+GOOGLE_APPLICATION_CREDENTIALS environment variable to a service account key. The Google Cloud CLI
+(gcloud) is no longer required.'
 
     } # End of PSData hashtable
 

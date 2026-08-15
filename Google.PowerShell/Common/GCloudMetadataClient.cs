@@ -19,7 +19,9 @@ namespace Google.PowerShell.Common
         /// </summary>
         internal const string GoogleMetadataHeader = "Google";
 
-        internal static HttpClient Client = new HttpClient();
+        // Use a short timeout so that project-id lookups fail fast when the module is not running on a
+        // Google Cloud VM (the metadata server address is unreachable off-GCE).
+        internal static HttpClient Client = new HttpClient { Timeout = TimeSpan.FromSeconds(3) };
 
         // Constant strings to avoid duplication below.
         // IP address instead of name to avoid DNS resolution

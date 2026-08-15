@@ -78,6 +78,24 @@ namespace Google.PowerShell.Common
 
         protected static ICredential GetCredential()
         {
+            // A service account activated with 'Connect-GcpAccount -ServiceAccountKeyFile' is an explicit
+            // choice and takes precedence over everything else.
+            GoogleCredential serviceAccountCredential = GoogleCloudCredential.ActiveServiceAccountCredential;
+            if (serviceAccountCredential != null)
+            {
+                return serviceAccountCredential;
+            }
+
+            // A service account key referenced by GOOGLE_APPLICATION_CREDENTIALS is an explicit choice and takes
+            // precedence (useful for automation). Otherwise, if the user has signed in interactively with
+            // Connect-GcpAccount, use that credential directly. Checking for a stored login first also avoids the
+            // cost of GetApplicationDefault() throwing on every call when no ADC is configured.
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS")) &&
+                GoogleCloudCredential.HasStoredCredential())
+            {
+                return new AuthenticateWithSdkCredentialsExecutor();
+            }
+
             try
             {
                 GoogleCredential credential = GoogleCredential.GetApplicationDefault();
@@ -87,9 +105,42 @@ namespace Google.PowerShell.Common
                 }
                 return credential;
             }
-            catch(InvalidOperationException ex) when(ex.Message.StartsWith("Your default credentials were not found.")) { }
+            catch (Exception ex) when (IsDefaultCredentialsNotFound(ex))
+            {
+                // No Application Default Credentials are configured; fall back to the interactive user login.
+                // If the user has not run Connect-GcpAccount, the executor throws an actionable error when a
+                // request is made.
+            }
 
             return new AuthenticateWithSdkCredentialsExecutor();
+        }
+
+        /// <summary>
+        /// Returns true if the exception (or any exception it wraps, including inside an AggregateException)
+        /// indicates that Application Default Credentials could not be found.
+        /// GoogleCredential.GetApplicationDefault surfaces this as an AggregateException, so the inner
+        /// exceptions must be inspected rather than matching on the top-level exception alone.
+        /// </summary>
+        private static bool IsDefaultCredentialsNotFound(Exception ex)
+        {
+            IEnumerable<Exception> candidates = ex is AggregateException aggregate
+                ? (IEnumerable<Exception>)aggregate.Flatten().InnerExceptions
+                : new[] { ex };
+
+            foreach (Exception candidate in candidates)
+            {
+                for (Exception current = candidate; current != null; current = current.InnerException)
+                {
+                    if (current is InvalidOperationException &&
+                        current.Message.IndexOf(
+                            "default credentials were not found", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -119,7 +170,6 @@ namespace Google.PowerShell.Common
                 // and the file does not exist, this exception will be thrown.
                 // However, we can still resolve the path with GetUnresolvedProviderPathFromPSPath to C:\Test\Blah.text
                 ProviderInfo provider = null;
-                PSDriveInfo psDrive = null;
                 string unresolvedPath = SessionState.Path?.GetUnresolvedProviderPathFromPSPath(
                     itemEx.ItemName, out provider, out _);
                 return new Tuple<string, ProviderInfo>(unresolvedPath, provider);
@@ -470,7 +520,6 @@ namespace Google.PowerShell.Common
                         HelpMessage = helpMessage,
                         ParameterSetName = parameterSetNames[i]
                     };
-                    paramAttribute.ParameterSetName = parameterSetNames[i];
                     attributeLists.Add(paramAttribute);
                 }
             }

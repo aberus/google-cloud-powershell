@@ -55,8 +55,8 @@ Describe "Restart-GcSqlInstance" {
         $instance = "test-inst$r"
 
         try {
-            # Set gcloud config to a non-default project (not gcloud-powershell-testing)
-            gcloud config set project $nonDefaultProject 2>$null
+            # Set the default project to a non-default project (not gcloud-powershell-testing)
+            Set-GcpConfig -Project $nonDefaultProject
 
             Add-GcSqlInstance $instance -Project $defaultProject
             Get-GcSqlInstance -Project $defaultProject -Name $instance | Restart-GcSqlInstance
@@ -71,8 +71,8 @@ Describe "Restart-GcSqlInstance" {
         finally {
             Remove-GcSqlInstance -Instance $instance -Project $defaultProject -ErrorAction SilentlyContinue
 
-            # Reset gcloud config back to default project (gcloud-powershell-testing)
-            gcloud config set project $defaultProject 2>$null
+            # Reset the default project back to gcloud-powershell-testing
+            Set-GcpConfig -Project $defaultProject
         }
      }
 }
@@ -131,8 +131,8 @@ Describe "ConvertTo-GcSqlInstance" {
         $r = Get-Random
         $replica = "test-repl$r"
         try {
-            # Set gcloud config to a non-default project (not gcloud-powershell-testing)
-            gcloud config set project $nonDefaultProject 2>$null
+            # Set the default project to a non-default project (not gcloud-powershell-testing)
+            Set-GcpConfig -Project $nonDefaultProject
 
             New-GcSqlSettingConfig $2ndGenTier -ReplicationType SYNCHRONOUS | New-GcSqlInstanceConfig $replica -MasterInstanceName $masterInstance | Add-GcSqlInstance -Project $defaultProject | Out-Null
             Get-GcSqlInstance -Project $defaultProject -Name $replica | ConvertTo-GcSqlInstance
@@ -147,8 +147,8 @@ Describe "ConvertTo-GcSqlInstance" {
         finally {
             Remove-GcSqlInstance -Instance $replica -Project $defaultProject -ErrorAction SilentlyContinue
 
-            # Reset gcloud config back to default project (gcloud-powershell-testing)
-            gcloud config set project $defaultProject 2>$null
+            # Reset the default project back to gcloud-powershell-testing
+            Set-GcpConfig -Project $defaultProject
         }
      }
 }
@@ -194,8 +194,8 @@ Describe "Restore-GcSqlInstanceBackup" {
         $defaultProject = "gcloud-powershell-testing"
 
         try {
-            # Set gcloud config to a non-default project (not gcloud-powershell-testing)
-            gcloud config set project $nonDefaultProject 2>$null
+            # Set the default project to a non-default project (not gcloud-powershell-testing)
+            Set-GcpConfig -Project $nonDefaultProject
 
             $backupRunId = $backupRunIds1[2]
 
@@ -208,8 +208,8 @@ Describe "Restore-GcSqlInstanceBackup" {
             $operations[0].Error | Should Match ""
         }
         finally {
-            # Reset gcloud config back to default project (gcloud-powershell-testing)
-            gcloud config set project $defaultProject 2>$null
+            # Reset the default project back to gcloud-powershell-testing
+            Set-GcpConfig -Project $defaultProject
         }
      }
 
@@ -340,8 +340,8 @@ Describe "Invoke-GcSqlInstanceFailover" {
         $nonDefaultProject = "asdf"
         $defaultProject = "gcloud-powershell-testing"
 
-        # Set gcloud config to a non-default project (not gcloud-powershell-testing)
-        gcloud config set project $nonDefaultProject 2>$null
+        # Set the default project to a non-default project (not gcloud-powershell-testing)
+        Set-GcpConfig -Project $nonDefaultProject
 
         Get-GcSqlInstance -Project $defaultProject -Name $instance | Invoke-GcSqlInstanceFailover
 
@@ -350,8 +350,8 @@ Describe "Invoke-GcSqlInstanceFailover" {
         $operations[0].Status | Should Match "DONE"
         $operations[0].Error | Should Match ""
 
-        # Reset gcloud config back to default project (gcloud-powershell-testing)
-        gcloud config set project $defaultProject 2>$null
+        # Reset the default project back to gcloud-powershell-testing
+        Set-GcpConfig -Project $defaultProject
     }
     #>
 
